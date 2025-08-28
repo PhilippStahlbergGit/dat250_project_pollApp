@@ -1,12 +1,15 @@
 package com.example.experiment1.domain;
 import java.time.Instant;
+import java.util.List;
 
 public class Poll {
     private String pollId;
     private String question;
+    private List<VoteOption> options;
     private Instant publishedAt;
     private Instant validUntil;
     private String createdBy;
+    
 
     public Poll() {}
 
@@ -22,6 +25,13 @@ public class Poll {
     }
     public void setQuestion( String question ) {
         this.question = question;
+    }
+
+    public List<VoteOption> getOptions() {
+        return options;
+    }
+    public void setOptions( List<VoteOption> options ) {
+        this.options = options;
     }
     
     public Instant getPublishedAt() {
@@ -44,6 +54,7 @@ public class Poll {
     public void setCreatedBy( String createdBy ) {
         this.createdBy = createdBy;
     }
+    
 
 
 }

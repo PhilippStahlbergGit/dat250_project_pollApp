@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class PollController {
 
     private static int pollIdCounter = 1;
 
-    @PostMapping("user/{userId}")
+    @PostMapping("{userId}")
     public void createPoll( @RequestBody Poll poll, @PathVariable String userId) {
 
         poll.setPollId(String.valueOf(pollIdCounter++));
@@ -30,11 +31,18 @@ public class PollController {
         if (poll.getValidUntil() == null) {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
-        pollManager.getPolls().put(poll.getQuestion(), poll);
+        pollManager.getPolls().put(poll.getPollId(), poll);
     }
 
     @GetMapping
     public Collection<Poll> getAllPolls() {
         return pollManager.getPolls().values();
+    }
+
+    @DeleteMapping("delete/{pollId}")
+    public void deletePoll(@PathVariable String pollId) {
+        pollManager.getPolls().remove(pollId);
+        //Remove all votes on this poll
+        pollManager.getVote().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
     }
 }

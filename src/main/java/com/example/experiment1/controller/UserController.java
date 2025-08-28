@@ -25,7 +25,7 @@ public class UserController {
     @PostMapping
     public void createUser( @RequestBody User user ) {
         user.setUserId(String.valueOf(userIdCounter++));
-        pollManager.getUsers().put(user.getUsername(), user);
+        pollManager.getUsers().put(user.getUserId(), user);
     }
     @GetMapping
     public Collection<User> getAllUsers() {
