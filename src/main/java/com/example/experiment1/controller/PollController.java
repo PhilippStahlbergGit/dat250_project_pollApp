@@ -43,6 +43,6 @@ public class PollController {
     public void deletePoll(@PathVariable String pollId) {
         pollManager.getPolls().remove(pollId);
         //Remove all votes on this poll
-        pollManager.getVote().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
+        pollManager.getVote().entrySet().removeIf(entry -> entry.getKey().endsWith(":"+ pollId));
     }
 }
