@@ -15,4 +15,4 @@ After i had made all the logic in the controllers and made the test scenario wor
 Here i first had some trouble because i wanted to have more tests instead of just one test testing the entire sequence, because i wanted to see where it went wrong if it did, I then realized i could initiate with @BeforeEach to run the start and then just test different aspects.
 When running ./gradlew test everything looked fine and all the tests ran nicely 
 
-[Link text](https://github.com/SondreGarnes/experiment1_dat250)
+[Link to code](https://github.com/SondreGarnes/experiment1_dat250)
