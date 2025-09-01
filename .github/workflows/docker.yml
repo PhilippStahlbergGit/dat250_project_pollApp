@@ -29,7 +29,12 @@ jobs:
         
       - name: List build/libs contents
         run: ls -l build/libs
-      
+
+      - name: Print working directory
+        run: pwd
+      - name: List everything
+        run: ls -lR
+        
       - name: Build Docker Image
         run: docker build -t sondregarnaes/experiment_dat250:latest .
       
