@@ -26,6 +26,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+      - name: List build/libs contents
+        run: ls -l build/libs
       
       - name: Build Docker Image
         run: docker build -t sondregarnaes/experiment_dat250:latest .
