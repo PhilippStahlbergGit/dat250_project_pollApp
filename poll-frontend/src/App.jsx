@@ -6,7 +6,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
 
   const [question, setQuestion] = useState('')
-  const [options, setOptions] = useState(['',''])
+  const [option1, setOption1] = useState('')
+  const [option2, setOption2] = useState('')
   const [createdPoll, setCreatedPoll] = useState(null)
   
   const handleLogin = async (e) => {
@@ -15,7 +16,17 @@ function App() {
       setLoggedIn(true);
     }
   };
-
+  const handlePoll = (e) => {
+    e.preventDefault()
+    setCreatedPoll({
+      question,
+      options: [option1, option2],
+      createdBy: username,
+    })
+    setQuestion('')
+    setOption1('')
+    setOption2('')
+  }
 
   return (
     <>
@@ -50,14 +61,7 @@ function App() {
                   onChange={e => setQuestion(e.target.value)}
                   required
                 />
-                {options.length > 2 && (
-                  <button type="button" onClick={() => removeOption(idx)}>
-                    Remove Option
-                  </button>
-                  
-                )}
               </form>
-
             </div>
           </div>
           
