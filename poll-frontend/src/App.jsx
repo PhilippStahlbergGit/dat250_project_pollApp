@@ -1,71 +1,79 @@
-import { use, useState } from "react"
+import { useState, useEffect } from "react"
 
 function App() {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
+
+  const [polls, setPolls] = useState([
+    { pollId: "1", question: "Favorite color?", options: [{ caption: "Red" , votes: 3}, { caption: "Blue", votes: 0 }] },
+    { pollId: "2", question: "Best season?", options: [{ caption: "Summer", votes:4 }, { caption: "Winter", votes: 3 }] }
+  ])
+
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [loggedIn, setLoggedIn] = useState(false)
 
-  const [question, setQuestion] = useState('')
-  const [option1, setOption1] = useState('')
-  const [option2, setOption2] = useState('')
-  const [createdPoll, setCreatedPoll] = useState(null)
-  
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault()
-    if (username.trim()) {
-      setLoggedIn(true);
-    }
-  };
-  const handlePoll = (e) => {
-    e.preventDefault()
-    setCreatedPoll({
-      question,
-      options: [option1, option2],
-      createdBy: username,
+    fetch("http://localhost:8080/users", {
+      method: "POST",
+      headers: {"Content-Type": "application/json" },
+      body: JSON.stringify({ username, email })
     })
-    setQuestion('')
-    setOption1('')
-    setOption2('')
+      .then(res => {
+        if (res.ok) {
+          setLoggedIn(true)
+        } else {
+          alert("Failed to create user")
+        }
+      })
+      .catch(() => alert("Failed to connect to backend"))
   }
+
+  //Get polls
+  useEffect(() => {
+    fetch("http://localhost:8080/polls")
+      .then(res => res.json())
+      .then(data => setPolls(data))
+
+    })
+  
+  
 
   return (
     <>
       <h1>Poll App</h1>
       <div>
-        {!loggedIn ? (
-          <form onSubmit={handleLogin}>
-            <input
-              type="text"
-              placeholder="enter username"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="enter email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <button type="submit">Log In</button>
-          </form>
-        ) : (
-          <div>
-            <p>Welcome, {username}</p>
-            <div>
-              <h2>Create Poll</h2>
-              <form onSubmit={handlePoll}>
-                <input
-                  type="text"
-                  placeholder={"Poll question"}
-                  value={question}
-                  onChange={e => setQuestion(e.target.value)}
-                  required
-                />
-              </form>
-            </div>
+        <div id="Hele siden">
+          <div id="Login">
+            <h2>Log in</h2>
+            <form onSubmit={handleLogin}>
+              <input type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)} required />
+              <input type="text" placeholder="email"  value={email} onChange={e => setEmail(e.target.value)} required />
+              <button type="submit">Log in</button>
+            </form>
           </div>
-          
-        )}
+          <div id="Create poll">
+            <h2>Create poll</h2>
+            <form>
+              <input type="text" placeholder="Question" />
+              <input type="text" placeholder="Option"/>
+              <input type="text" placeholder="Option"/>
+              <button>Submit</button>
+            </form>
+          </div>
+
+          <div id="polls">
+            {polls.map(poll => (
+              <div key={poll.pollId}>
+                <h2>{poll.question}</h2>
+                <ul>
+                  {poll.options.map((opt, idx) => (
+                    <li key={idx}>{opt.caption} - {opt.votes} votes <button>Vote</button> </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   )
