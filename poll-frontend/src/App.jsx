@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-
+import './App.css'
 function App() {
 
   const [polls, setPolls] = useState([])
@@ -88,21 +88,21 @@ function App() {
 
   return (
     <>
-      <h1>Poll App for smarte folk</h1>
+      <h1>Poll App</h1>
       <div>
         <div id="Hele siden">
           {!loggedIn && (
             <div id="Login">
               <h2>Log in</h2>
-              <form onSubmit={handleLogin}>
+              <form onSubmit={handleLogin} className="loginform">
                 <input type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)} required />
                 <input type="text" placeholder="email"  value={email} onChange={e => setEmail(e.target.value)} required />
-                <button type="submit">Log in</button>
+                <button type="submit" id="loginbutton">Log in</button>
               </form>
             </div>
           )}
           {loggedIn &&(
-            <div id="Create poll">
+            <div className="createPollComponent">
             <h2>Create poll</h2>
             <form onSubmit={handleCreatePolls}>
               <input type="text" placeholder="Question" value={question} onChange={e => setQuestion(e.target.value)} required/>
@@ -114,11 +114,12 @@ function App() {
           )}
           
 
-          <div id="polls">
+          <div className="pollComponent">
             {polls.map(poll => {
               const creator = users.find(u => u.userId === poll.createdBy)
               return(
-              <div key={poll.pollId}>
+              <div key={poll.pollId} className="poll-box">
+                <h4>Poll number: {poll.pollId}</h4>
                 <h2>{poll.question}</h2>
                 <ul>
                   {poll.options.map((opt, idx) => (
