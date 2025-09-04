@@ -2,76 +2,134 @@ import { useState, useEffect } from "react"
 
 function App() {
 
-  const [polls, setPolls] = useState([
-    { pollId: "1", question: "Favorite color?", options: [{ caption: "Red" , votes: 3}, { caption: "Blue", votes: 0 }] },
-    { pollId: "2", question: "Best season?", options: [{ caption: "Summer", votes:4 }, { caption: "Winter", votes: 3 }] }
-  ])
+  const [polls, setPolls] = useState([])
+  const [users, setUsers] = useState([])
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [loggedIn, setLoggedIn] = useState(false)
+  const [userId, setUserId] = useState(null)
+
+  const [question, setQuestion] = useState("")
+  const [option1, setOption1] = useState("")
+  const [option2, setOption2] = useState("")
+
+  //Fetch users
+  useEffect(() => {
+    fetch("/users")
+    .then(res => res.json())
+    .then(data => setUsers(data))
+  }, [])
+  //Fetch polls
+  useEffect(() => {
+    fetch("/polls")
+      .then(res => res.json())
+      .then(data => setPolls(data))
+
+    }, [])
 
   const handleLogin = (e) => {
     e.preventDefault()
-    fetch("http://localhost:8080/users", {
+    fetch("/users", {
       method: "POST",
       headers: {"Content-Type": "application/json" },
       body: JSON.stringify({ username, email })
     })
-      .then(res => {
-        if (res.ok) {
-          setLoggedIn(true)
-        } else {
-          alert("Failed to create user")
-        }
+      .then(res => res.json())
+      .then(data => {
+        setLoggedIn(true)
+        setUserId(data.userId)
+        fetch("/users")
+        .then(res => res.json())
+        .then(data => setUsers(data))
       })
+
       .catch(() => alert("Failed to connect to backend"))
   }
 
-  //Get polls
-  useEffect(() => {
-    fetch("http://localhost:8080/polls")
-      .then(res => res.json())
-      .then(data => setPolls(data))
-
+  const handleCreatePolls = (e) => {
+    e.preventDefault()
+    if(!userId) {
+      alert("You must be logged in to create a poll")
+      return
+    }
+    fetch(`/polls/${userId}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json" },
+      body: JSON.stringify({ question, options:[
+        { caption: option1},
+        { caption: option2}
+      ]})
     })
-  
-  
+      .then(() => {
+        fetch("/polls")
+          .then(res => res.json())
+          .then(data => setPolls(data))
+      })
+      
+  }
+
+  const handleVote = (pollId, optionIdx) => {
+    if(!userId) {
+      alert("You must be logged in to vote")
+      return
+    }
+    fetch(`/vote/${userId}/${pollId}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json" },
+      body: JSON.stringify({ optionIndex: optionIdx + 1 })
+    })
+      .then(() => {
+        fetch("/polls")
+          .then(res => res.json())
+          .then(data => setPolls(data))
+      })
+  }
 
   return (
     <>
-      <h1>Poll App</h1>
+      <h1>Poll App for smarte folk</h1>
       <div>
         <div id="Hele siden">
-          <div id="Login">
-            <h2>Log in</h2>
-            <form onSubmit={handleLogin}>
-              <input type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)} required />
-              <input type="text" placeholder="email"  value={email} onChange={e => setEmail(e.target.value)} required />
-              <button type="submit">Log in</button>
-            </form>
-          </div>
-          <div id="Create poll">
+          {!loggedIn && (
+            <div id="Login">
+              <h2>Log in</h2>
+              <form onSubmit={handleLogin}>
+                <input type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)} required />
+                <input type="text" placeholder="email"  value={email} onChange={e => setEmail(e.target.value)} required />
+                <button type="submit">Log in</button>
+              </form>
+            </div>
+          )}
+          {loggedIn &&(
+            <div id="Create poll">
             <h2>Create poll</h2>
-            <form>
-              <input type="text" placeholder="Question" />
-              <input type="text" placeholder="Option"/>
-              <input type="text" placeholder="Option"/>
-              <button>Submit</button>
+            <form onSubmit={handleCreatePolls}>
+              <input type="text" placeholder="Question" value={question} onChange={e => setQuestion(e.target.value)} required/>
+              <input type="text" placeholder="Option" value={option1} onChange={e => setOption1(e.target.value)} required/>
+              <input type="text" placeholder="Option" value={option2} onChange={e => setOption2(e.target.value)} required/>
+              <button type="submit">Submit</button>
             </form>
           </div>
+          )}
+          
 
           <div id="polls">
-            {polls.map(poll => (
+            {polls.map(poll => {
+              const creator = users.find(u => u.userId === poll.createdBy)
+              return(
               <div key={poll.pollId}>
                 <h2>{poll.question}</h2>
                 <ul>
                   {poll.options.map((opt, idx) => (
-                    <li key={idx}>{opt.caption} - {opt.votes} votes <button>Vote</button> </li>
+                    <li key={idx}>{opt.caption} - {opt.votes} votes {" "}
+                    <button onClick={() => handleVote(poll.pollId, idx)}>Vote</button> </li>
                   ))}
                 </ul>
+                <h3>Created by: {creator ? creator.username : "Unknown"}</h3>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>

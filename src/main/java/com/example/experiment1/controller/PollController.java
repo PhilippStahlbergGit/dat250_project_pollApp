@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.experiment1.service.PollManager;
 import com.example.experiment1.domain.Poll;
+import com.example.experiment1.domain.VoteOption;
 
 @CrossOrigin
 @RestController
@@ -38,6 +39,23 @@ public class PollController {
 
     @GetMapping
     public Collection<Poll> getAllPolls() {
+            for (Poll poll : pollManager.getPolls().values()) {
+        // Reset votes for each option
+        for (VoteOption option : poll.getOptions()) {
+            option.setVotes(0);
+        }
+        // Count votes for each option
+        pollManager.getVote().values().stream()
+            .filter(v -> v.getPollId().equals(poll.getPollId()))
+            .forEach(v -> {
+                int idx = v.getOptionIndex() - 1; // 1-based index
+                if (idx >= 0 && idx < poll.getOptions().size()) {
+                    poll.getOptions().get(idx).setVotes(
+                        poll.getOptions().get(idx).getVotes() + 1
+                    );
+                }
+            });
+        }
         return pollManager.getPolls().values();
     }
 

@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class VoteOption {
     private String caption;
     private int presentationOrder;
+    private int votes;
 }
