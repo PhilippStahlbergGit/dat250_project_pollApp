@@ -17,6 +17,10 @@ jobs:
       with:
         node-version: '22'
 
+    - name: Install frontend dependencies
+      working-directory: poll-frontend
+      run: npm install
+      
     - name: Build and copy frontend
       working-directory: poll-frontend
       run: ./gradlew copyWebApp
