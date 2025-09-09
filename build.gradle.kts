@@ -33,6 +33,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.32")
 	testImplementation("org.projectlombok:lombok:1.18.32")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
 
 }
 

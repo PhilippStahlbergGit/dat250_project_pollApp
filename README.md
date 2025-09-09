@@ -1,2 +1,2 @@
-# experiment1_dat250
-first experiment in dat250
+# experiments_dat250
+experiments in dat250
