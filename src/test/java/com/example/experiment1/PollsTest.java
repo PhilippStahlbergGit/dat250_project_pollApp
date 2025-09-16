@@ -84,8 +84,8 @@ public class PollsTest {
     @Test
     public void testVotes() {
         emf.runInTransaction(em -> {
-            Long vimVotes = em.createQuery("select count(v) from Vote v join v.votesOn as o join o.poll as p join p.createdBy u where u.email = :mail and o.presentationOrder = :order", Long.class).setParameter("mail", "alice@online.com").setParameter("order", 0).getSingleResult();
-            Long emacsVotes = em.createQuery("select count(v) from Vote v join v.votesOn as o join o.poll as p join p.createdBy u where u.email = :mail and o.presentationOrder = :order", Long.class).setParameter("mail", "alice@online.com").setParameter("order", 1).getSingleResult();
+            Long vimVotes = em.createQuery("select count(v) from Vote v join v.votesOn as o join o.poll as p join p.createdByUser u where u.email = :mail and o.presentationOrder = :order", Long.class).setParameter("mail", "alice@online.com").setParameter("order", 0).getSingleResult();
+            Long emacsVotes = em.createQuery("select count(v) from Vote v join v.votesOn as o join o.poll as p join p.createdByUser u where u.email = :mail and o.presentationOrder = :order", Long.class).setParameter("mail", "alice@online.com").setParameter("order", 1).getSingleResult();
             assertEquals(2, vimVotes);
             assertEquals(1, emacsVotes);
         });
@@ -94,7 +94,7 @@ public class PollsTest {
     @Test
     public void testOptions() {
         emf.runInTransaction(em -> {
-            List<String> poll2Options = em.createQuery("select o.caption from Poll p join p.options o join p.createdBy u where u.email = :mail order by o.presentationOrder", String.class).setParameter("mail", "eve@mail.org").getResultList();
+            List<String> poll2Options = em.createQuery("select o.caption from Poll p join p.options o join p.createdByUser u where u.email = :mail order by o.presentationOrder", String.class).setParameter("mail", "eve@mail.org").getResultList();
             List<String> expected = Arrays.asList("Yes! Yammy!", "Mamma mia: Nooooo!");
             assertEquals(expected, poll2Options);
         });
