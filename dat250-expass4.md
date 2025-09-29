@@ -17,5 +17,6 @@ Images is added to the assignment and in images folder
 
 I can see that there is alot of null values telling me that it does not work correctly this is probably why createdBy is not working.
 
-
+[ Link to polls-table ](https://github.com/SondreGarnes/experiment1_dat250/blob/main/images/polls_table.png)
+[ Link to users-table ](https://github.com/SondreGarnes/experiment1_dat250/blob/main/images/users_table.png)
 [ Link to code ](https://github.com/SondreGarnes/experiment1_dat250)
