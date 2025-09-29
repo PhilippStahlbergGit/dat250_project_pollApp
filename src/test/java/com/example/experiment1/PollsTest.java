@@ -18,11 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-// TODO: you may have to adjust the imports to import the domain model entities
-// import no.hvl.dat250.jpa.polls.Poll;
-// import no.hvl.dat250.jpa.polls.User;
-// import no.hvl.dat250.jpa.polls.VoteOption;
-// import no.hvl.dat250.jpa.polls.Vote;
+
 
 
 
@@ -59,7 +55,7 @@ public class PollsTest {
                 .managedClass(User.class)
                 .managedClass(Vote.class)
                 .managedClass(VoteOption.class)
-                .property(PersistenceConfiguration.JDBC_URL, "jdbc:h2:mem:polls")
+                .property(PersistenceConfiguration.JDBC_URL, "jdbc:h2:file:./testdb;DB_CLOSE_ON_EXIT=FALSE")
                 .property(PersistenceConfiguration.SCHEMAGEN_DATABASE_ACTION, "drop-and-create")
                 .property(PersistenceConfiguration.JDBC_USER, "sa")
                 .property(PersistenceConfiguration.JDBC_PASSWORD, "")
@@ -100,4 +96,5 @@ public class PollsTest {
         });
     }
 }
+
 
