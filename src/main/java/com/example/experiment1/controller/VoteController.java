@@ -12,15 +12,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.experiment1.service.PollManager;
-
+import com.example.experiment1.service.RedisPollService;
+import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.Vote;
+import com.example.experiment1.domain.VoteOption;
 @CrossOrigin
 @RestController
 @RequestMapping("/vote")
 public class VoteController {
     @Autowired
     private PollManager pollManager;
-
+    @Autowired
+    private RedisPollService redisPollService;
     @PostMapping("/{userId}/{pollId}")
     public void createVote( @RequestBody Vote vote, @PathVariable String userId, @PathVariable String pollId) {
         vote.setUserId(userId);
@@ -34,6 +37,17 @@ public class VoteController {
         
         //Add the new vote
         pollManager.getVote().put(key, vote);
+
+        if (redisPollService.isRedisAvailable()) {
+            Poll poll = pollManager.getPolls().get(pollId);
+            if (poll != null && poll.getOptions() != null) {
+                int optionIndex = vote.getOptionIndex() - 1;
+                if (optionIndex >= 0 && optionIndex < poll.getOptions().size()) {
+                    VoteOption option = poll.getOptions().get(optionIndex);
+                    redisPollService.incrementVoteCount(pollId, option.getCaption());
+                }
+            }
+        }
     }
 
     @GetMapping

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.experiment1.service.PollManager;
+import com.example.experiment1.service.RedisPollService;
 import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.VoteOption;
 
@@ -22,7 +23,7 @@ import com.example.experiment1.domain.VoteOption;
 @RequestMapping("/polls")
 public class PollController {
     @Autowired PollManager pollManager;
-
+    @Autowired RedisPollService redisPollService;
     private static int pollIdCounter = 1;
 
     @PostMapping("{userId}")
@@ -35,6 +36,14 @@ public class PollController {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
         pollManager.getPolls().put(poll.getPollId(), poll);
+        if (redisPollService.isRedisAvailable()) {
+            redisPollService.storePollMetadata(poll.getPollId(), poll.getQuestion());
+            if (poll.getOptions() != null) {
+                for (VoteOption option : poll.getOptions()) {
+                    redisPollService.setVoteCount(poll.getPollId(), option.getCaption(), 0);
+                }
+            }
+        }
     }
 
     @GetMapping
