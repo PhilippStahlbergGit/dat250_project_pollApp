@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.experiment1.service.PollManager;
+import com.example.experiment1.service.RabbitMQPollService;
 import com.example.experiment1.service.RedisPollService;
 import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.VoteOption;
@@ -24,6 +25,7 @@ import com.example.experiment1.domain.VoteOption;
 public class PollController {
     @Autowired PollManager pollManager;
     @Autowired RedisPollService redisPollService;
+    @Autowired RabbitMQPollService rabbitMQPollService;
     private static int pollIdCounter = 1;
 
     @PostMapping("{userId}")
@@ -44,6 +46,7 @@ public class PollController {
                 }
             }
         }
+        rabbitMQPollService.publishPollCreated(poll.getPollId(), poll.getQuestion(), userId);
     }
 
     @GetMapping
