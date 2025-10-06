@@ -3,6 +3,7 @@ package com.example.experiment1.controller;
 import java.time.Instant;
 import java.util.Collection;
 
+import com.example.experiment1.service.RabbitMQPollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ public class VoteController {
     private PollManager pollManager;
     @Autowired
     private RedisPollService redisPollService;
+    @Autowired
+    RabbitMQPollService rabbitMQPollService;
     @PostMapping("/{userId}/{pollId}")
     public void createVote( @RequestBody Vote vote, @PathVariable String userId, @PathVariable String pollId) {
         vote.setUserId(userId);
@@ -48,6 +51,9 @@ public class VoteController {
                 }
             }
         }
+        rabbitMQPollService.publishVoteCreated(vote.getPollId(), vote.getOptionIndex()-1, userId);
+
+
     }
 
     @GetMapping
