@@ -38,6 +38,7 @@ public class PollController {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
         pollManager.getPolls().put(poll.getPollId(), poll);
+        
         if (redisPollService.isRedisAvailable()) {
             redisPollService.storePollMetadata(poll.getPollId(), poll.getQuestion());
             if (poll.getOptions() != null) {
@@ -46,6 +47,7 @@ public class PollController {
                 }
             }
         }
+        
         rabbitMQPollService.publishPollCreated(poll.getPollId(), poll.getQuestion(), userId);
     }
 

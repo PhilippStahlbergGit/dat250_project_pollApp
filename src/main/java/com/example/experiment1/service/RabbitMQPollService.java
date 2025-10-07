@@ -19,9 +19,9 @@ public class RabbitMQPollService {
         factory = new ConnectionFactory();
         factory.setHost("localhost");
         try  {connection = factory.newConnection();
-        channel = connection.createChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME, "topic");
-        System.out.println("[x] Connected to RabbitMQ");
+            channel = connection.createChannel();
+            channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+            System.out.println("[x] Connected to RabbitMQ");
         } catch (Exception e) {
             System.err.println("[ERROR] Failed to connect to RabbitMQ");
         }
@@ -40,11 +40,12 @@ public class RabbitMQPollService {
             System.err.println("Failed to publish poll created:" + e.getMessage());
         }
     }
-    public void publishVoteCreated(String pollId, int optionIndex, String createdBy) {
+    public void publishVoteCreated(String pollId, int optionIndex, String optionCaption, String createdBy) {
         try {
-            String routingkey = "poll." + pollId + ".created";
-            String message = String.format("{\"pollId\":\"%s\",\"optionIndex\":\"%s\",\"createdBy\":\"%s\",\"event\":\"voted\":}",
-                    pollId, optionIndex, createdBy);
+            String routingkey = "poll." + pollId + ".vote";
+            String message = String.format(
+                    "{\"pollId\":\"%s\",\"optionIndex\":%d,\"optionCaption\":\"%s\",\"createdBy\":\"%s\",\"event\":\"vote\"}",
+                    pollId, optionIndex, optionCaption, createdBy);
             channel.basicPublish(EXCHANGE_NAME, routingkey, null, message.getBytes(StandardCharsets.UTF_8));
             System.out.println("[x] Sent poll voted");
 

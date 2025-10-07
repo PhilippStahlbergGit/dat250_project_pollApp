@@ -40,7 +40,8 @@ public class VoteController {
         
         //Add the new vote
         pollManager.getVote().put(key, vote);
-
+        //Commenting out direct update with Redis to listen for votes from the poll service instead.
+        /* 
         if (redisPollService.isRedisAvailable()) {
             Poll poll = pollManager.getPolls().get(pollId);
             if (poll != null && poll.getOptions() != null) {
@@ -51,7 +52,17 @@ public class VoteController {
                 }
             }
         }
-        rabbitMQPollService.publishVoteCreated(vote.getPollId(), vote.getOptionIndex()-1, userId);
+        */
+        // map optionIndex -> caption (vote.optionIndex is 1-based in app)
+        String optionCaption = null;
+        int optionIndexZeroBased = vote.getOptionIndex() - 1;
+        Poll poll = pollManager.getPolls().get(pollId);
+        if (poll != null && poll.getOptions() != null && optionIndexZeroBased >= 0 && optionIndexZeroBased < poll.getOptions().size()) {
+            VoteOption option = poll.getOptions().get(optionIndexZeroBased);
+            if (option != null) optionCaption = option.getCaption();
+        }
+
+        rabbitMQPollService.publishVoteCreated(vote.getPollId(), optionIndexZeroBased, optionCaption, userId);
 
 
     }

@@ -20,6 +20,7 @@ public class Recv {
         
         String queueName = channel.queueDeclare().getQueue();
 
+        channel.queueBind(queueName, EXCHANGE_NAME, "poll.*.vote");
         channel.queueBind(queueName, EXCHANGE_NAME, "poll.*.created");
 
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
