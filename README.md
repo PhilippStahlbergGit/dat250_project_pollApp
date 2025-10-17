@@ -1,2 +1,2 @@
-# experiments_dat250
-experiments in dat250
+# Code for the project
+By Jørgen, Runar, Philip and the mastermind Sondre
