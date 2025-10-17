@@ -1,7 +1,0 @@
-# Report for Assignment 6
-
-I managed to get the polls sent through the broker when creating a poll, which worked well. Using the RabbitMQPollService and using that in PollController. I used Recv.java to receive the messages, next step would be to implement it so that when a message is sent it updates the database.
-This does not now register any votes, it would need to have function in the RabbitPollservice to register the votes and send them, but this should be sent in the same topic as the poll that is associated.
-Now when i send a vote it should be received in the RedisPollService, but i had a problem with receiving the correct message to update the Redis db,
-I found it helpful to use my Recv class to listen to the messages and see what was happening.
-I managed to make it work in the end, and i could see that when i received a message from Rabbit of a vote it would increment the vote count. I could check the messages looking at Recv.java In the pictures you can see from rabbitmessages the messages i receive on Recv.java, and in the update after creating a vote.png you can see The vote is incremented after i receive the message, I commented out the call to increment the votes directly to the redis db
