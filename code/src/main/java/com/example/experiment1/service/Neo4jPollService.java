@@ -5,7 +5,7 @@ import org.neo4j.driver.GraphDatabase;
 
 public class Neo4jPollService {
     public static void main(String... args) {
-        final String dbUri = ("bolt://localhost:7688");
+        final String dbUri = ("bolt://localhost:7687");
         final String dbUser = ("neo4j");
         final String dbPassword = ("supersecret");
 
@@ -14,5 +14,5 @@ public class Neo4jPollService {
             System.out.println("Connection established");
         }
     }
-    
+
 }
