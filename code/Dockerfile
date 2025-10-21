@@ -1,9 +1,44 @@
-FROM eclipse-temurin:21-jre-alpine
+# Taken mostly from lecture-example about dockerimages
+# we have two events, our building and running stage seperated
 
+# -- BUILDING STAGE ---
+
+# Do compilation inside a (throw-away) builder container
+FROM gradle:8.14.3-alpine AS builder
+
+# working directory inside the container is implicitly /home/gradle, but we make it explicit here
+WORKDIR /home/gradle
+
+# copy only necessary source code files
+COPY settings.gradle.kts build.gradle.kts .
+
+# Copying a folder recursively need special attention
+COPY src src
+COPY gradle gradle
+
+# compile with gradle
+RUN gradle bootJar
+
+# check older version(s) of images
+RUN ls -al /home/gradle/build/libs
+
+# -- RUNTIME STAGE --
+# This will be the base image for the running application
+FROM eclipse-temurin:21-alpine
+
+# creating a new user to avoid running the app as root
+RUN addgroup -g 1000 app
+RUN adduser -G app -D -u 1000 -h /app app
+
+# switch into the newly created user and directory
+USER app
 WORKDIR /app
 
-COPY build/libs/Experiment1-0.0.1-SNAPSHOT.jar app.jar
+# copy the app from the builder image,using a wildcard instead
+COPY --from=builder --chown=1000:1000 /home/gradle/build/libs/*.jar /app/app.jar  
 
-EXPOSE 8080
+# copy the database file
+#COPY --chown=1000:1000 app.mv.db /app/storage/app.mv.db
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+# Start the Spring Boot app when the container starts
+CMD ["java", "-jar", "app.jar"]
