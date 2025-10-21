@@ -1,0 +1,4 @@
+{
+    "latex-workshop.linting.chktex.exec.path": "C:\\Program Files\\MiKTeX\\miktex\\bin\\x64\\chktex.exe",
+    "java.compile.nullAnalysis.mode": "disabled"
+}
