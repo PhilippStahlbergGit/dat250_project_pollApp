@@ -1,8 +1,9 @@
 package com.example.experiment1.controller;
+import com.example.experiment1.domain.Role;
 import com.example.experiment1.domain.User;
 
 import java.util.Collection;
-
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +28,9 @@ public class UserController {
     public User createUser( @RequestBody User user ) {
         user.setUserId(String.valueOf(userIdCounter++));
         pollManager.getUsers().put(user.getUserId(), user);
+        if(user.getRoles() == null || user.getRoles().isEmpty()){
+            user.setRoles(Set.of(Role.NORMAL));
+        }
         return user;
     }
     @GetMapping

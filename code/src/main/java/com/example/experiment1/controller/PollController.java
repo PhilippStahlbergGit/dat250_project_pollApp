@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,8 @@ public class PollController {
     @Autowired RabbitMQPollService rabbitMQPollService;
     private static int pollIdCounter = 1;
 
+    // only admins can create a Poll
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{userId}")
     public void createPoll( @RequestBody Poll poll, @PathVariable String userId) {
 

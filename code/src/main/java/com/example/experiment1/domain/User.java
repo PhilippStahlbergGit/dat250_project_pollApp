@@ -2,9 +2,14 @@ package com.example.experiment1.domain;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.HashSet;
+
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +34,15 @@ public class User {
     private String userId;
     private String username;
     private String email;
+
+    // new feature, a user can have a role
+    // Fetchtype.eager => we want to fetch the role after the parent info is known (user)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name="role")
+    private Set<Role> roles = new HashSet<>();
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OneToMany(mappedBy = "createdByUser", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,5 +79,20 @@ public class User {
         vote.setOptionIndex(option.getPresentationOrder());
         vote.setVotesOn(option);
         return vote;
+    }
+
+    /**
+     * 
+     * 
+     */
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    /**
+     * 
+     */
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

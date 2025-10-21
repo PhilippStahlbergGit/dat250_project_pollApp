@@ -43,6 +43,8 @@ dependencies {
 	implementation("com.rabbitmq:amqp-client:5.20.0")
 	//	implementation("org.neo4j.driver:neo4j-java-driver:5.6.0") Old version, should not be use Old version, should not be used
 	implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
+	// security added, basic spring handled one
+	implementation("org.springframework.boot:spring-boot-starter-security") 
 }
 
 tasks.withType<Test> {
