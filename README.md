@@ -11,7 +11,9 @@ Fikse Neo4j Runar
 
 ### Skrive rapporten
 Intro Runar
+
 Feedapp design Jørgen
+
 Feature technology Sondre
 
 
