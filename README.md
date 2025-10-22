@@ -16,6 +16,7 @@ Intro og feedapp design Runar
 Feature technology Sondre
 
 
+https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md
 
 
 
