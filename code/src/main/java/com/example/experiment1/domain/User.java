@@ -20,6 +20,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -32,17 +40,21 @@ public class User {
 
 	private String userId;
 	private String username;
+	// this password is for the login procedure, for security purposes 
+	private String password;
 	private String email;
+
+
 
 	// new feature, a user can have a role
 	// Fetchtype.eager => we want to fetch the role after the parent info is known
 	// (user)
-	// @ElementCollection(fetch = FetchType.EAGER)
-	// @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name =
-	// "user_id"))
-	// @Enumerated(EnumType.STRING)
-	// @Column(name="role")
-	// private Set<Role> roles = new HashSet<>();
+	 @ElementCollection(fetch = FetchType.EAGER)
+	 @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name =
+	 "user_id"))
+	 @Enumerated(EnumType.STRING)
+	 @Column(name="role")
+	 private Set<Role> roles = new HashSet<>();
 
 	@OneToMany(mappedBy = "createdByUser")
 	@JsonManagedReference("user-poll")
@@ -70,7 +82,6 @@ public class User {
 		this.created.add(poll);
 		return poll;
 	}
-
 	/**
 	 * Creates a new Vote for a given VoteOption in a Poll
 	 * and returns the Vote as an object.
@@ -87,18 +98,18 @@ public class User {
 	 * 
 	 */
 
-	/*
-	 * public Set<Role> getRoles() {
-	 * return roles;
-	 * }
-	 */
+	
+	public Set<Role> getRoles() {
+	  	return roles;
+	}
+	 
 
 	/**
 	 * 
 	 */
-	/*
-	 * public void setRoles(Set<Role> roles) {
-	 * this.roles = roles;
-	 * }
-	 */
+	
+	public void setRoles(Set<Role> roles) {
+	  	this.roles = roles;
+	}
+	 
 }
