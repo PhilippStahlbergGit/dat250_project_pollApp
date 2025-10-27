@@ -28,9 +28,9 @@ public class UserController {
     public User createUser( @RequestBody User user ) {
         user.setUserId(String.valueOf(userIdCounter++));
         pollManager.getUsers().put(user.getUserId(), user);
-        if(user.getRoles() == null || user.getRoles().isEmpty()){
+       /* if(user.getRoles() == null || user.getRoles().isEmpty()){
             user.setRoles(Set.of(Role.NORMAL));
-        }
+        }*/
         return user;
     }
     @GetMapping

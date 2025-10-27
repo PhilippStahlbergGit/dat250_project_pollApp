@@ -16,7 +16,7 @@ public class Experiment1Application {
     }
 
 
-	@Bean
+	/*@Bean
 	public CommandLineRunner startupActions(@AutoWired PollManager pollManager) {
 		return args -> {
 
@@ -24,7 +24,7 @@ public class Experiment1Application {
             if(!pollManager.getUsers().containsKey(adminID)){
                 User admin = new User("admin", "admin@company.com");
                 admin.setUserId(adminID);
-                admin.setRoles(Set.Of(Role.ADMIN);
+                admin.setRoles(Set.Of(Role.ADMIN));
                 pollManager.getUsers().put(adminID,admin);
                 // print created admin
             }else{
@@ -37,7 +37,7 @@ public class Experiment1Application {
 
 
 
-		};
+		};*/
 
     }
 

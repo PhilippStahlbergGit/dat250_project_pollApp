@@ -41,10 +41,14 @@ dependencies {
 	implementation("redis.clients:jedis:6.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("com.rabbitmq:amqp-client:5.20.0")
+	// try adding jpa starter kit
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+
 	//	implementation("org.neo4j.driver:neo4j-java-driver:5.6.0") Old version, should not be use Old version, should not be used
 	implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
-	// security added, basic spring handled one
-	implementation("org.springframework.boot:spring-boot-starter-security") 
+	// security added, basic spring handled one, security add later
+	//implementation("org.springframework.boot:spring-boot-starter-security") 
 }
 
 tasks.withType<Test> {

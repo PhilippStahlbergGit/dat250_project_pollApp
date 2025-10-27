@@ -10,8 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
-
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +28,10 @@ public class Vote {
     private String pollId;
     private int optionIndex;
     private Instant publishedAt;
+
+
+    @ToString.Exclude
+	@EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name = "vote_option_id")
     private VoteOption votesOn;
