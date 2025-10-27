@@ -1,4 +1,4 @@
-package com.example.experiment1.service;
+package com.example.experiment1.cache;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,15 +22,16 @@ import com.example.experiment1.repository.PollCacheRepository;
 //   neo4j:latest
 
 @Service
-public class Neo4jPollService {
+public class Neo4jPollCache implements PollCache {
 
     private final PollCacheRepository repo;
 
-    public Neo4jPollService(PollCacheRepository repo) {
+    public Neo4jPollCache(PollCacheRepository repo) {
         this.repo = repo;
     }
 
     @Transactional
+    @Override
     public void recordVote(String pollId, String option) {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
             return new PollAggregate(pollId, new HashMap<>(), LocalDateTime.now());
@@ -40,12 +41,14 @@ public class Neo4jPollService {
         repo.save(aggregate);
     }
 
+    @Override
     public Map<String, Integer> getAggregatedResults(String pollId) {
         return repo.findById(pollId)
                 .map(PollAggregate::getResults)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found: " + pollId));
     }
 
+    @Override
     @Scheduled(fixedRate = 60000)
     public void cleanStaleAggregates() {
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
