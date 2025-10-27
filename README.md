@@ -3,7 +3,7 @@
 # TODO
 
 ### Progging
-Security i Appen Philipp [UNDERWAY]
+Security i Appen Philipp [FIXED] (bug here needs to be fixed also)
 
 Fikse Persistence til database Philipp [FIXED]
 
