@@ -1,11 +1,14 @@
 package com.example.experiment1.controller;
 import com.example.experiment1.domain.Role;
 import com.example.experiment1.domain.User;
+import com.example.experiment1.security.UserRepository;
 
 import java.util.Collection;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,31 +16,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.experiment1.service.PollManager;
 @CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     @Autowired
-    private PollManager pollManager;
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static int userIdCounter = 1;
 
-    @PostMapping
-    public User createUser( @RequestBody User user ) {
-        user.setUserId(String.valueOf(userIdCounter++));
-        pollManager.getUsers().put(user.getUserId(), user);
-       /* if(user.getRoles() == null || user.getRoles().isEmpty()){
-            user.setRoles(Set.of(Role.NORMAL));
-        }*/
-        return user;
+    // retrive the USER and thereby we cna find the role of the user later also.
+    @GetMapping("/me")
+    public User getLoggedInUser(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        }
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElse(null);
     }
+
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        user.setUserId(String.valueOf(userIdCounter++));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            user.setRoles(Set.of(Role.NORMAL));
+        }
+        return userRepository.save(user);
+    }
+
     @GetMapping
     public Collection<User> getAllUsers() {
-        return pollManager.getUsers().values();
+        return (Collection<User>) userRepository.findAll();
     }
-
-
-
 }
