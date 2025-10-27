@@ -3,9 +3,9 @@
 # TODO
 
 ### Progging
-Security i Appen Philipp 
+Security i Appen Philipp [UNDERWAY]
 
-Fikse Persistence til database Philipp
+Fikse Persistence til database Philipp [FIXED]
 
 Fikse Neo4j Runar
 
