@@ -1,17 +1,73 @@
-\section{Design}
+\section{Design, DETTE SKAL DU JOBBE MED}
 \label{sec:design}
+
+\subsection{The Use Cases}
+\label{sec:design}
+
+For this project, we have two types of users; admin users and normal users. Both types of users must create an account before they can participate in polls. Admin users have additional permissions, such as creating and deleting polls, while normal users can only vote. We designed the system this way to implement role-based authorization, ensuring that each user role has the appropriate level of access and control within the application.
+
+
+If you’re gonna have the possibility to vote on our website, you have to create a user and log into this user to access the page. This is important because we don’t want people submitting multiple votes or accessing the voting system without proper authentication. Having user accounts ensures that each vote is tied to a verified identity, making the process fair and secure.
+
+\subsection{The Domain Model}
+\label{sec:design}
+
+When it comes to the domain model. there is several different things we have to look after. 
+
+The polls has to have at least two options. The reason for this is because it does not make sense to have a poll with only 1 option. However, the user can make as many options as he'd like for each poll. 
+
+Each user is allowed to vote for only one option per poll. This restriction is in place to prevent multiple votes from a single user, ensuring that the results remain accurate and fair. However, one could argue that in cases where a question has multiple valid answers, users should be able to select more than one option. Examples of such questions include “When would you like to have this week’s meeting?” or “Which ice cream flavors do you like the most?”. But for simplicity, we do not allow this. 
+
+Each user can vote only once per poll. It is unnecessary for a single user to cast multiple votes for the same poll option, so the system ensures that only one vote per user is allowed.
+
+
+\subsubsection{Poll entity}
+
+The poll entity is used for making the actual polls in the application. When you create a poll, it consists of a question and a list of possible answers (voteoptions). Users select one of these options when they are casting a vote. Poll acts therefore as a aggregate root for the voteoption entity. 
+
+The poll domain consists of:
+\begin{itemize}
+
+\item \textbf{id:} Primary key, unique identifier for each poll so the system can differentiate them (auto-generated). It is a Long. 
+
+\item \textbf{pollId:} A readable or public ID for the poll, used for links or references. It is a string.
+
+\item \textbf{question:} The question or statement that users are voting on.
+
+\item \textbf{options:} A list of VoteOption entities representing the possible answers or choices for the poll. This is a one-to-many relationship.
+
+\item \textbf{publishedAt:} Showing when the poll was published
+
+\item \textbf{validUntil:} Showing when the poll is valid (for example when voting closes).
+
+\item \textbf{createdBy:} The name or username of the person who created the poll, stored as plain text.
+
+\item \textbf{createdByUser:} A reference to the actual user in the system, represented as a @Manytoone relationship to the user entity. This is so you can access more information about the person who created the poll.
+
+\end{itemize}
+
+\section{FORTSETT HER ^^^}
 
 Around 5 pages about functional aspects of the FeedApp application.
 
 Concretely, you shall write about 
 
+
+
 \begin{itemize}
 	\item the \emph{use cases},
+
+
 	\item the \emph{domain model}, and
 	\item the \emph{architecture} (including applied technologies)
 \end{itemize}
 
+
+
+
 Each part shall ideally be accompanied with a graphical representation (diagram).
+
+
 
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
 
