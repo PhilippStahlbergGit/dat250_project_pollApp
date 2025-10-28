@@ -32,11 +32,11 @@ public class Neo4jPollCache implements PollCache {
 
     @Transactional
     @Override
-    public void recordVote(String pollId, String option) {
+    public void updateVote(String pollId, String option, int count) {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
             return new PollAggregate(pollId, new HashMap<>(), LocalDateTime.now());
         });
-        aggregate.getResults().merge(option, 1, Integer::sum);
+        aggregate.getResults().merge(option, count, Integer::sum);
         aggregate.setLastUpdated(LocalDateTime.now());
         repo.save(aggregate);
     }
@@ -69,6 +69,16 @@ public class Neo4jPollCache implements PollCache {
             System.out.println("Connection established");
             driver.close();
         }
+    }
+
+    @Override
+    public void savePoll(PollAggregate pollAggregate) {
+        repo.save(pollAggregate);
+    }
+
+    @Override
+    public void removePoll(String pollId) {
+        repo.deleteById(pollId);
     }
 
 }
