@@ -2,6 +2,7 @@ package com.example.experiment1.service;
 
 import com.example.experiment1.domain.User;
 import com.example.experiment1.domain.Poll;
+import com.example.experiment1.domain.PollAggregate;
 import com.example.experiment1.domain.Vote;
 import com.example.experiment1.domain.VoteOption;
 import com.example.experiment1.cache.PollCache;
@@ -9,6 +10,7 @@ import com.example.experiment1.cache.PollCache;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -32,7 +34,7 @@ public class PollManager {
         return polls;
     }
 
-    public Map<String, Vote> getVote() {
+    public Map<String, Vote> getVotes() {
         return votes;
     }
 
@@ -48,24 +50,21 @@ public class PollManager {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
         this.getPolls().put(poll.getPollId(), poll);
+
+        // Save in cache
+        Map<String, Integer> results = new HashMap<>();
+        for (VoteOption option : poll.getOptions()) {
+            results.put(option.getCaption(), 0);
+        }
+        pollCache.savePoll(new PollAggregate(poll.getPollId(), results, LocalDateTime.now()));
     }
 
     public Collection<Poll> getAllPolls() {
         for (Poll poll : this.getPolls().values()) {
-            // Reset votes for each option
+            Map<String, Integer> aggregatedResults = pollCache.getAggregatedResults(poll.getPollId());
             for (VoteOption option : poll.getOptions()) {
-                option.setVotes(0);
+                option.setVotes(aggregatedResults.get(option.getCaption()));
             }
-            // Count votes for each option
-            this.getVote().values().stream()
-                    .filter(v -> v.getPollId().equals(poll.getPollId()))
-                    .forEach(v -> {
-                        int idx = v.getOptionIndex() - 1; // 1-based index
-                        if (idx >= 0 && idx < poll.getOptions().size()) {
-                            poll.getOptions().get(idx).setVotes(
-                                    poll.getOptions().get(idx).getVotes() + 1);
-                        }
-                    });
         }
         return this.getPolls().values();
     }
@@ -73,32 +72,32 @@ public class PollManager {
     public void deletePoll(String pollId) {
         this.getPolls().remove(pollId);
         // Remove all votes on this poll
-        this.getVote().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
+        this.getVotes().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
+        pollCache.removePoll(pollId);
     }
 
     public void createVote(Vote vote, String userId, String pollId) {
         vote.setUserId(userId);
         vote.setPollId(pollId);
         vote.setPublishedAt(Instant.now());
-        // Combine userId and pollId in a key
         String key = vote.getUserId() + ":" + vote.getPollId();
+        Vote oldVote = this.getVotes().put(key, vote);
 
-        // Remove old vote if it exists
-        this.getVote().remove(key);
-
-        // Add the new vote
-        this.getVote().put(key, vote);
-
-        String optionCaption = null;
-        int optionIndexZeroBased = vote.getOptionIndex() - 1;
         Poll poll = this.getPolls().get(pollId);
-        if (poll != null && poll.getOptions() != null && optionIndexZeroBased >= 0
-                && optionIndexZeroBased < poll.getOptions().size()) {
-            VoteOption option = poll.getOptions().get(optionIndexZeroBased);
-            if (option != null)
-                optionCaption = option.getCaption();
-        }
+        if (poll != null && poll.getOptions() != null) {
+            int newIdx = vote.getOptionIndex() - 1;
+            String optionCaption = poll.getOptions().get(newIdx).getCaption();
 
+            // Decrement old vote in cache
+            if (oldVote != null) {
+                int oldIdx = oldVote.getOptionIndex() - 1;
+                String oldCaption = poll.getOptions().get(oldIdx).getCaption();
+                pollCache.updateVote(pollId, oldCaption, -1);
+            }
+
+            // Increment new vote in cache
+            pollCache.updateVote(pollId, optionCaption, 1);
+        }
     }
 
     public User createUser(User user) {

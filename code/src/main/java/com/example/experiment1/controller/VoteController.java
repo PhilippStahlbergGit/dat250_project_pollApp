@@ -30,7 +30,7 @@ public class VoteController {
 
     @GetMapping
     public Collection<Vote> getAllVotes() {
-        return pollManager.getVote().values();
+        return pollManager.getVotes().values();
     }
 
 }
