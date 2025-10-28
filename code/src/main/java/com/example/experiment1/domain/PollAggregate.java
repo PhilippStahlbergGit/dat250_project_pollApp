@@ -3,7 +3,6 @@ package com.example.experiment1.domain;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
 
 import org.springframework.data.neo4j.core.schema.Id;
@@ -12,7 +11,6 @@ import org.springframework.data.neo4j.core.schema.Id;
 public class PollAggregate {
 
     @Id
-    @GeneratedValue
     private final String pollId;
     private final Map<String, Integer> results;
     private LocalDateTime lastUpdated;
