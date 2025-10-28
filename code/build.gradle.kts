@@ -41,8 +41,11 @@ dependencies {
 	implementation("redis.clients:jedis:6.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("com.rabbitmq:amqp-client:5.20.0")
-	//implementation("org.neo4j.driver:neo4j-java-driver:5.6.0") too outdated version, let spring handle version below.
+
 	implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
+	implementation("org.testcontainers:testcontainers:1.20.0")
+	implementation("org.testcontainers:neo4j:1.20.0")
+
 
 }
 
