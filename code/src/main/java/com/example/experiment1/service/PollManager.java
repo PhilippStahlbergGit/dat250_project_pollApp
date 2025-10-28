@@ -1,12 +1,10 @@
 package com.example.experiment1.service;
 
 import com.example.experiment1.domain.User;
-import com.example.experiment1.cache.Neo4jPollCache;
 import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.Vote;
 import com.example.experiment1.domain.VoteOption;
 import com.example.experiment1.cache.PollCache;
-import com.example.experiment1.repository.PollCacheRepository;
 
 import org.springframework.stereotype.Component;
 import java.util.Map;
@@ -20,7 +18,7 @@ public class PollManager {
     private static int userIdCounter = 1;
     private static int pollIdCounter = 1;
 
-    private final PollCache pollcache;
+    private final PollCache pollCache;
 
     private Map<String, User> users = new HashMap<>();
     private Map<String, Poll> polls = new HashMap<>();
@@ -38,8 +36,8 @@ public class PollManager {
         return votes;
     }
 
-    public PollManager(PollCacheRepository repo) {
-        this.pollcache = new Neo4jPollCache(repo);
+    public PollManager(PollCache pollCache) {
+        this.pollCache = pollCache;
     }
 
     public void createPoll(Poll poll, String userId) {
@@ -50,16 +48,6 @@ public class PollManager {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
         this.getPolls().put(poll.getPollId(), poll);
-
-        // if (redisPollService.isRedisAvailable()) {
-        // redisPollService.storePollMetadata(poll.getPollId(), poll.getQuestion());
-        // if (poll.getOptions() != null) {
-        // for (VoteOption option : poll.getOptions()) {
-        // redisPollService.setVoteCount(poll.getPollId(), option.getCaption(), 0);
-        // }
-        // }
-        // }
-
     }
 
     public Collection<Poll> getAllPolls() {
