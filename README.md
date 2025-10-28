@@ -3,19 +3,15 @@
 # TODO
 
 ### Progging
-Security i Appen Philipp [FIXED] (bug here needs to be fixed also)
+Security i Appen Philipp [UNDERWAY]
 
-Fikse Persistence til database Philipp [FIXED]
-
-Fikse Neo4j Runar
+Fikse Neo4j Runar [STARTED]
 
 ### Skrive rapporten
-Intro Runar
 
 Feedapp design Jørgen
 
 Feature technology Sondre
-
 
 https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md
 
