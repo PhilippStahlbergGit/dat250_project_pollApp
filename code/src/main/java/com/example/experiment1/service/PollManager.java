@@ -23,14 +23,14 @@ public class PollManager {
     private final PollCache pollCache;
 
     private Map<String, User> users = new HashMap<>();
-    private Map<String, Poll> polls = new HashMap<>();
+    private Map<Long, Poll> polls = new HashMap<>();
     private Map<String, Vote> votes = new HashMap<>();
 
     public Map<String, User> getUsers() {
         return users;
     }
 
-    public Map<String, Poll> getPolls() {
+    public Map<Long, Poll> getPolls() {
         return polls;
     }
 
@@ -43,25 +43,25 @@ public class PollManager {
     }
 
     public void createPoll(Poll poll, String userId) {
-        poll.setPollId(String.valueOf(pollIdCounter++));
+        poll.setPollId(String.valueOf(poll.getId()));
         poll.setPublishedAt(Instant.now());
         poll.setCreatedBy(userId);
         if (poll.getValidUntil() == null) {
             poll.setValidUntil(Instant.now().plusSeconds(86400));
         }
-        this.getPolls().put(poll.getPollId(), poll);
+        this.getPolls().put(poll.getId(), poll);
 
         // Save in cache
         Map<String, Integer> results = new HashMap<>();
         for (VoteOption option : poll.getOptions()) {
             results.put(option.getCaption(), 0);
         }
-        pollCache.savePoll(new PollAggregate(poll.getPollId(), results, LocalDateTime.now()));
+        pollCache.savePoll(new PollAggregate(poll.getId(), results, LocalDateTime.now()));
     }
 
     public Collection<Poll> getAllPolls() {
         for (Poll poll : this.getPolls().values()) {
-            Map<String, Integer> aggregatedResults = pollCache.getAggregatedResults(poll.getPollId());
+            Map<String, Integer> aggregatedResults = pollCache.getAggregatedResults(poll.getId());
             for (VoteOption option : poll.getOptions()) {
                 option.setVotes(aggregatedResults.get(option.getCaption()));
             }
@@ -69,16 +69,16 @@ public class PollManager {
         return this.getPolls().values();
     }
 
-    public void deletePoll(String pollId) {
+    public void deletePoll(Long pollId) {
         this.getPolls().remove(pollId);
         // Remove all votes on this poll
         this.getVotes().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
         pollCache.removePoll(pollId);
     }
 
-    public void createVote(Vote vote, String userId, String pollId) {
+    public void createVote(Vote vote, String userId, Long pollId) {
         vote.setUserId(userId);
-        vote.setPollId(pollId);
+        vote.setPollId(pollId.toString());
         vote.setPublishedAt(Instant.now());
         String key = vote.getUserId() + ":" + vote.getPollId();
         Vote oldVote = this.getVotes().put(key, vote);

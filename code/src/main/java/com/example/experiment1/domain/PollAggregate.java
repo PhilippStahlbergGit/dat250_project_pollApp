@@ -11,11 +11,11 @@ import org.springframework.data.neo4j.core.schema.Id;
 public class PollAggregate {
 
     @Id
-    private final String pollId;
+    private final Long pollId;
     private final Map<String, Integer> results;
     private LocalDateTime lastUpdated;
 
-    public PollAggregate(String pollId, Map<String, Integer> results, LocalDateTime lastUpdated) {
+    public PollAggregate(Long pollId, Map<String, Integer> results, LocalDateTime lastUpdated) {
         this.pollId = pollId;
         this.results = results;
         this.lastUpdated = lastUpdated;

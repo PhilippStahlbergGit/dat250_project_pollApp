@@ -32,7 +32,7 @@ public class Neo4jPollCache implements PollCache {
 
     @Transactional
     @Override
-    public void updateVote(String pollId, String option, int count) {
+    public void updateVote(Long pollId, String option, int count) {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
             return new PollAggregate(pollId, new HashMap<>(), LocalDateTime.now());
         });
@@ -42,7 +42,7 @@ public class Neo4jPollCache implements PollCache {
     }
 
     @Override
-    public Map<String, Integer> getAggregatedResults(String pollId) {
+    public Map<String, Integer> getAggregatedResults(Long pollId) {
         return repo.findById(pollId)
                 .map(PollAggregate::getResults)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found: " + pollId));
@@ -77,7 +77,7 @@ public class Neo4jPollCache implements PollCache {
     }
 
     @Override
-    public void removePoll(String pollId) {
+    public void removePoll(Long pollId) {
         repo.deleteById(pollId);
     }
 

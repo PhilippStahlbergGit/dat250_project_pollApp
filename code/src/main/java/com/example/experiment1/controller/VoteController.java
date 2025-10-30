@@ -23,7 +23,7 @@ public class VoteController {
     private PollManager pollManager;
 
     @PostMapping("/{userId}/{pollId}")
-    public void createVote(@RequestBody Vote vote, @PathVariable String userId, @PathVariable String pollId) {
+    public void createVote(@RequestBody Vote vote, @PathVariable String userId, @PathVariable Long pollId) {
         pollManager.createVote(vote, userId, pollId);
 
     }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.example.experiment1.domain.PollAggregate;
 
 @Repository
-public interface PollCacheRepository extends Neo4jRepository<PollAggregate, String> {
+public interface PollCacheRepository extends Neo4jRepository<PollAggregate, Long> {
 
 }
