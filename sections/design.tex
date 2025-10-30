@@ -20,12 +20,34 @@ Each user is allowed to vote for only one option per poll. This restriction is i
 
 Each user can vote only once per poll. It is unnecessary for a single user to cast multiple votes for the same poll option, so the system ensures that only one vote per user is allowed.
 
+Here are the following entities in our application: 
+
+\subsubsection{User entity}
+
+The User entity represents an application user and stores profile information and the polls the user has created. It is a persistent JPA entity and serves as the aggregate root for the user aggregate.
+The user domain consists of:
+
+\begin{itemize}
+
+\item \textbf{id:} Primary key, unique identifier for each user so the system can differentiate them (auto-generated). It is a Long.
+
+\item \textbf{userId:} A readable/public identifier for the user (String) suitable for links or external references (distinct from DB id).
+
+\item \textbf{username:} The display name of the user (String).
+
+\item \textbf{email:} The user's contact email (String).
+
+\item \textbf{created:} A set of Poll entities this user created (Set\<Poll\>). This is a one-to-many relationship (mappedBy = "createdByUser") with CascadeType.ALL and orphanRemoval = true in the current mapping.
+
+\end{itemize}
+
 
 \subsubsection{Poll entity}
 
-The poll entity is used for making the actual polls in the application. When you create a poll, it consists of a question and a list of possible answers (voteoptions). Users select one of these options when they are casting a vote. Poll acts therefore as a aggregate root for the voteoption entity. 
+The poll entity is used for making the actual polls in the application. When you create a poll, it consists of a question and a list of possible answers (voteoptions). Users select one of these options when they are casting a vote. Poll acts therefore as a aggregate root for the voteoption entity. This entity acts as a aggregate root for the poll aggregate.
 
 The poll domain consists of:
+
 \begin{itemize}
 
 \item \textbf{id:} Primary key, unique identifier for each poll so the system can differentiate them (auto-generated). It is a Long. 
@@ -45,6 +67,36 @@ The poll domain consists of:
 \item \textbf{createdByUser:} A reference to the actual user in the system, represented as a @Manytoone relationship to the user entity. This is so you can access more information about the person who created the poll.
 
 \end{itemize}
+
+
+\subsubsection{Vote entity}
+
+The Vote entity represents a single vote cast by a user for a specific option in a poll. Each vote records which user voted, for which poll, and which option was selected. Vote acts as an entity in the domain model and is associated with a VoteOption. This entity is part of the poll aggregate.
+
+The vote domain consists of:
+\begin{itemize}
+\item \textbf{id:} Primary key, unique identifier for each vote so the system can differentiate them (auto-generated). It is a Long.
+\item \textbf{userId:} The identifier of the user who cast the vote, stored as a String.
+\item \textbf{pollId:} The identifier of the poll in which the vote was cast, stored as a String.
+\item \textbf{optionIndex:} The index of the option that was selected by the user (int).
+\item \textbf{publishedAt:} The timestamp showing when the vote was published (Instant).
+\item \textbf{votesOn:} A reference to the VoteOption entity that this vote is associated with. This is a many-to-one relationship.
+\end{itemize}
+
+\subsubsection{VoteOption entity}
+
+The VoteOption entity represents a single possible answer or choice within a poll. Each poll contains a list of VoteOption entities, and users select one of these options when casting their vote. VoteOption is associated with a specific Poll. This entity is part of the poll aggregate. While VoteOption could have been modeled as a value object, we chose to implement it as an entity because it has its own unique identifier and can be independently referenced, for example to track votes for each option.
+
+
+The voteOption domain consists of:
+\begin{itemize}
+\item \textbf{id:} Primary key, unique identifier for each vote option so the system can differentiate them (auto-generated). It is a Long.
+\item \textbf{caption:} The text or label describing the option (String).
+\item \textbf{presentationOrder:} The order in which this option is presented in the poll (int).
+\item \textbf{votes:} The number of votes this option has received (int).
+\item \textbf{poll:} A reference to the Poll entity that this option belongs to. This is a many-to-one relationship.
+\end{itemize}
+
 
 \section{FORTSETT HER ^^^}
 
