@@ -3,7 +3,7 @@
 # TODO
 
 ### Progging
-Security i Appen Philipp [UNDERWAY]
+Småe endringer i applikasjonen - Phil.
 
 Fikse Neo4j Runar [STARTED]
 
