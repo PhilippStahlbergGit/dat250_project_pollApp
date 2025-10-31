@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.experiment1.config;
 
 import org.testcontainers.containers.Neo4jContainer;
 import org.neo4j.driver.AuthTokens;
