@@ -107,16 +107,28 @@ function App() {
   }
 
   const handleVote = (pollId, optionIdx) => {
-    if(!user) {
+    if(!user || !username || !password || !user.id) {
       alert("You must be logged in to vote.");
       return;
     }
+    const userId = user.id
     const credentials = btoa(`${username}:${password}`);
-    fetch(`/votes/${pollId}/${optionIdx}`, {
+	
+    // vote object to be sent via POST req.
+    const voteBody = {
+	userId: userId,
+	pollId: pollId,
+	optionIndex: optionIdx
+    }
+
+
+    fetch(`/vote/${userId}/${pollId}`, {
         method: "POST",
         headers: {
+	    "Content-Type": "application/json",
             "Authorization": `Basic ${credentials}`
-        }
+        },
+	body: JSON.stringify(voteBody)
     })
     .then(res => {
         if (res.ok) {
@@ -182,7 +194,7 @@ function App() {
                 <ul>
                   {poll.options.map((option, index) => (
                     <li key={option.id}>
-                      {option.caption} ({option.votes} votes)
+                      {option.caption} ({option.vote} vote)
                       {loggedIn && <button onClick={() => handleVote(poll.pollId, index + 1)}>Vote</button>}
                     </li>
                   ))}
