@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class Neo4jContainerConfig {
 
-    @Bean(destroyMethod = "shutdown")
+    @Bean(destroyMethod = "stop")
     public Neo4jContainer<?> neo4jContainer() {
         Neo4jContainer<?> neo4jContainer = new Neo4jContainer<>("neo4j:latest")
                 .withAdminPassword("supersecret");
