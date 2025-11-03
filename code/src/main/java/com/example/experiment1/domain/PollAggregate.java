@@ -1,6 +1,7 @@
 package com.example.experiment1.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,16 +13,16 @@ public class PollAggregate {
 
     @Id
     private final Long pollId;
-    private final Map<String, Integer> results;
+    private final List<OptionVote> results;
     private LocalDateTime lastUpdated;
 
-    public PollAggregate(Long pollId, Map<String, Integer> results, LocalDateTime lastUpdated) {
+    public PollAggregate(Long pollId, List<OptionVote> results, LocalDateTime lastUpdated) {
         this.pollId = pollId;
         this.results = results;
         this.lastUpdated = lastUpdated;
     }
 
-    public Map<String, Integer> getResults() {
+    public List<OptionVote> getResults() {
         return results;
     }
 

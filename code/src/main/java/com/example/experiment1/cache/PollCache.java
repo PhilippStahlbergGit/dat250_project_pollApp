@@ -1,7 +1,9 @@
 package com.example.experiment1.cache;
 
+import java.util.List;
 import java.util.Map;
 
+import com.example.experiment1.domain.OptionVote;
 import com.example.experiment1.domain.PollAggregate;
 
 public interface PollCache {
@@ -21,7 +23,7 @@ public interface PollCache {
      * @param pollId the poll ID
      * @return a map of option captions to their vote counts
      */
-    Map<String, Integer> getAggregatedResults(Long pollId);
+    List<OptionVote> getAggregatedResults(Long pollId);
 
     /**
      * Clean up stale poll aggregates that haven't been updated recently.

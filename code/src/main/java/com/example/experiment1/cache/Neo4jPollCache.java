@@ -1,7 +1,9 @@
 package com.example.experiment1.cache;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.neo4j.driver.AuthTokens;
@@ -10,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.experiment1.domain.OptionVote;
 import com.example.experiment1.domain.PollAggregate;
 import com.example.experiment1.repository.PollCacheRepository;
 
@@ -34,15 +37,15 @@ public class Neo4jPollCache implements PollCache {
     @Override
     public void updateVote(Long pollId, String option, int count) {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
-            return new PollAggregate(pollId, new HashMap<>(), LocalDateTime.now());
+            return new PollAggregate(pollId, new ArrayList<>(), LocalDateTime.now());
         });
-        aggregate.getResults().merge(option, count, Integer::sum);
+        aggregate.getResults().add(new OptionVote(option, count));
         aggregate.setLastUpdated(LocalDateTime.now());
         repo.save(aggregate);
     }
 
     @Override
-    public Map<String, Integer> getAggregatedResults(Long pollId) {
+    public List<OptionVote> getAggregatedResults(Long pollId) {
         return repo.findById(pollId)
                 .map(PollAggregate::getResults)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found: " + pollId));

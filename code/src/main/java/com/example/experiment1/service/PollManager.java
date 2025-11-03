@@ -1,6 +1,7 @@
 package com.example.experiment1.service;
 
 import com.example.experiment1.domain.User;
+import com.example.experiment1.domain.OptionVote;
 import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.PollAggregate;
 import com.example.experiment1.domain.Vote;
@@ -8,11 +9,14 @@ import com.example.experiment1.domain.VoteOption;
 import com.example.experiment1.cache.PollCache;
 
 import org.springframework.stereotype.Component;
+
 import java.util.Map;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class PollManager {
@@ -52,18 +56,22 @@ public class PollManager {
         this.getPolls().put(poll.getId(), poll);
 
         // Save in cache
-        Map<String, Integer> results = new HashMap<>();
+        List<OptionVote> results = new ArrayList<>();
         for (VoteOption option : poll.getOptions()) {
-            results.put(option.getCaption(), 0);
+            results.add(new OptionVote(option.getCaption(), 0));
         }
         pollCache.savePoll(new PollAggregate(poll.getId(), results, LocalDateTime.now()));
     }
 
     public Collection<Poll> getAllPolls() {
         for (Poll poll : this.getPolls().values()) {
-            Map<String, Integer> aggregatedResults = pollCache.getAggregatedResults(poll.getId());
+            List<OptionVote> aggregatedResults = pollCache.getAggregatedResults(poll.getId());
             for (VoteOption option : poll.getOptions()) {
-                option.setVotes(aggregatedResults.get(option.getCaption()));
+                option.setVotes(aggregatedResults.stream()
+                        .filter(ov -> ov.getOption().equals(option.getCaption()))
+                        .map(OptionVote::getVotes)
+                        .findFirst()
+                        .orElse(0));
             }
         }
         return this.getPolls().values();
