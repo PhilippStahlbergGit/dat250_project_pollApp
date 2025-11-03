@@ -14,6 +14,7 @@
 
 For this project, we have two types of users; admin users and normal users. Both types of users must create an account before they can participate in polls. Admin users have additional permissions, such as creating and deleting polls, while normal users can only vote. We designed the system this way to implement role-based authorization, ensuring that each user role has the appropriate level of access and control within the application.
 
+Admins are people that are then predefined, that means upon application start-up one can see in the terminal see the password and username (which often will be admin perhaps) tied to the admin user. That really just means that this user has a ADMIN-role, and can be logged on upon start-up without any registration (i.e no need to "create a user").
 
 If you’re gonna have the possibility to vote on our website, you have to create a user and log into this user to access the page. This is important because we don’t want people submitting multiple votes or accessing the voting system without proper authentication. Having user accounts ensures that each vote is tied to a verified identity, making the process fair and secure.
 
@@ -55,6 +56,8 @@ The user domain consists of:
 \item \textbf{email:} The user's contact email (String).
 
 \item \textbf{created:} A set of Poll entities this user created (Set\<Poll\>). This is a one-to-many relationship (mappedBy = "createdByUser") with CascadeType.ALL and orphanRemoval = true in the current mapping.
+
+\item \textbf{roles:} A set of Roles which keeps track of the users and their respective roles (Set\<Role\>). This set gets changed as the users and their roles get adjusted. The user if not set explicitly has the $NORMAL$ role, then the other alternative is $ADMIN$. 
 
 \end{itemize}
 
@@ -122,7 +125,7 @@ Here is the following component architecture for our project:
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{figs/arkitektur_figur.drawio (1) (1).png}
+    \includegraphics[width=0.5\textwidth]{figs/arkitektur_figur.drawio (1).png}
     \caption{Our architecture}
     \label{figs:logo}
 \end{figure}
@@ -158,4 +161,3 @@ You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/m
 
 
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
-
