@@ -12,11 +12,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurityConfig {
+
+    @Value("${spring.security.remember-me.key}")
+    private String rememberMeKey; // this key is taken from application.properties 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
@@ -32,6 +37,13 @@ public class WebSecurityConfig {
                 // All other requests need authentication (for safety purposes)
                 .anyRequest().authenticated()
             )
+        
+	    // adding a REMEBERME cookie-based solution to remember the user
+	    .rememberMe(rememberMe -> rememberMe
+		.key(rememberMeKey)
+		.tokenValiditySeconds(60*60*24) // 24 h validity!
+	    )
+		
             // Use HTTP Basic Auth instead of formLogin
             .httpBasic(Customizer.withDefaults());
 
