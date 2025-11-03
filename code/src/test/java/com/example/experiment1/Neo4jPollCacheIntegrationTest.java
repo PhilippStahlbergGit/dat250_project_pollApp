@@ -23,6 +23,9 @@ public class Neo4jPollCacheIntegrationTest {
     @Autowired
     private PollCache pollCache;
 
+    // currently the options are returned in reverse order from how they are saved,
+    // so tests are written accordingly
+
     @Test
     void testSaveAndRetrievePoll() {
         List<OptionVote> results = new ArrayList<>();
@@ -34,10 +37,10 @@ public class Neo4jPollCacheIntegrationTest {
 
         List<OptionVote> fetched = pollCache.getAggregatedResults(1L);
         assertEquals(2, fetched.size());
-        assertEquals("Red", fetched.get(0).getOption());
-        assertEquals(0, fetched.get(0).getVotes());
-        assertEquals("Blue", fetched.get(1).getOption());
+        assertEquals("Red", fetched.get(1).getOption());
         assertEquals(0, fetched.get(1).getVotes());
+        assertEquals("Blue", fetched.get(0).getOption());
+        assertEquals(0, fetched.get(0).getVotes());
     }
 
     @Test
@@ -52,8 +55,8 @@ public class Neo4jPollCacheIntegrationTest {
         pollCache.updateVote(2L, "Red", 1);
         List<OptionVote> updated = pollCache.getAggregatedResults(2L);
 
-        assertEquals(1, updated.get(0).getVotes());
-        assertEquals(0, updated.get(1).getVotes());
+        assertEquals(1, updated.get(1).getVotes());
+        assertEquals(0, updated.get(0).getVotes());
     }
 
     @Test

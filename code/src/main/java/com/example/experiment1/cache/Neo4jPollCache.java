@@ -39,6 +39,7 @@ public class Neo4jPollCache implements PollCache {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
             return new PollAggregate(pollId, new ArrayList<>(), LocalDateTime.now());
         });
+        aggregate.getResults().removeIf(ov -> ov.getOption().equals(option));
         aggregate.getResults().add(new OptionVote(option, count));
         aggregate.setLastUpdated(LocalDateTime.now());
         repo.save(aggregate);
