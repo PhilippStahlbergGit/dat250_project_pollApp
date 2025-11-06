@@ -8,7 +8,7 @@ figures. Figure~\ref{fig:framework} from \cite{brown:96} just
 illustrates how figure can be included in the report.
 \\
 \\
-In order to assess Neo4j in a structured and theoretically grounded manner, this report adopts the framework developed by Brown and Wallnau (1996) for evaluating software technology. Their approach was introduced to bring greater rigor and repeatability to technology assessments, emphasizing both qualitative and quantitative evaluation methods. The framework focuses on identifying the technology delta—that is, the distinct features that differentiate a technology from its peers—and systematically evaluating how these features contribute value within specific usage contexts.
+In order to assess Neo4j in a structured and theoretically grounded manner, this report adopts the framework developed by Brown and Wallnau \cite{brown:96} for evaluating software technology. Their approach was introduced to bring greater rigor and repeatability to technology assessments, emphasizing both qualitative and quantitative evaluation methods. The framework focuses on identifying the technology delta—that is, the distinct features that differentiate a technology from its peers—and systematically evaluating how these features contribute value within specific usage contexts.
 
 As shown in Figure~\ref{fig:framework}, the framework is divided into three main phases: descriptive modeling, experiment design, and experiment evaluation. Together, these phases provide a comprehensive structure for analyzing how Neo4j’s key concepts, architecture, and performance compare to alternative cache technologies.
 
@@ -37,38 +37,42 @@ So in the late 2000s Neo4j emerged with the NoSQL movemevent where organizations
 
 The problem Neo4j solve is where relationships are as important as the data itself. This is ideal for social networks which we could eventually want to use, or recommendation systems where we were thinking you could recommend relevant polls to users.
 
+The key feature delta that distinguishes Neo4j from both relational and other NoSQL databases lies in its native graph storage model and relationship-centric query language (Cypher). Instead of relying on costly table joins, Neo4j uses index-free adjacency, meaning each node directly stores references to connected nodes, enabling constant-time traversal across relationships. This makes it highly efficient for queries that explore deep or complex data networks.
+According to \cite{guia2017neo4j}, Neo4j introduces several defining features that reinforce this delta: it has its own Cypher query language, designed specifically for graph manipulation; it employs a disk-based proprietary storage system optimized for graph persistence; it guarantees ACID transaction integrity—a rare trait among NoSQL systems; and it provides an intuitive, accessible user interface that simplifies visualization and query management.
+Together, these characteristics highlight Neo4j’s unique combination of graph-native efficiency, strong consistency guarantees, and user-friendly design, which collectively form its technological delta compared to both relational and non-relational peers.
+
 \subsection{Experiment Design}
 
 Write you hypotheses about what benefits the technology bring and how you can support or reject them via experiments.
 \\
 \\
 
-We believe that in this case where we are creating a Poll App, our hypotheses is that using Neo4j as our cache will be beneficial for us as we are storing things which makes sense to put into a graph database. We also believe it will be easier to use then a key-value store for example because it is easier as developers to visualize the data and see what is happening behind the scenes. In this example we are doing here it will most likely not be quicker then a traditional NoSql database as for example Redis which is a key-value store. Since this is a relatively small app and we dont expect to high traffic we dont believe that efficiency is the most important part. We believe Neo4j can be beneficial if we were to choose to add additional functionality like for example adding friends and getting recommended polls based on earlier polls you have voted on, which would be a logical next step. We also believe having the cypher query language will make it easier for us to find our data, then using traditional look up. To support our hypotheses we will try to benchmark the quickness of neo4j versus redis which we already have implemented. Comparing these will give us an idea of the difference. Then we will look into the ease of use for both of these and the visualization ability. Then we can look at the tradeoff from both and see if neo4j is a viable option.
+We believe that in this case where we are creating a Poll App, our hypotheses is that using Neo4j as our cache will be beneficial for us as we are storing things which makes sense to put into a graph database. We also believe it will be easier to use then a key-value store for example because it is easier as developers to visualize the data and see what is happening behind the scenes. In this example we are doing here it will most likely not be quicker then a traditional NoSql database as for example Redis which is a key-value store. Since this is a relatively small app and we dont expect to high traffic we dont believe that efficiency is the most important part. We believe Neo4j can be beneficial if we were to choose to add additional functionality like for example adding friends and getting recommended polls based on earlier polls you have voted on, which would be a logical next step. We also believe having the cypher query language will make it easier for us to visualize our data and will therefore make it more user friendly, then using traditional look up. To support our hypotheses we will try to benchmark the quickness of neo4j versus redis which we already have implemented. Comparing these will give us an idea of the difference. Then we will look into the ease of use for both of these and the visualization ability. Then we can look at the tradeoff from both and see if neo4j is a viable option. We will also look at the ACID differences from Neo4j and Redis as it might be a key difference, however ACID is not a very valued principle for a cache.
 
 \subsection{Experiment Evaluation}
 
 Write about the results of your experiments, either via personal experience reports, quantitative benchmarks, a demostrator case study or a combination of multiple approaches.
 
-
 For some reports you may have to include a table with experimental
 results are other kinds of tables that for instance compares
 technologies. Table~\ref{tab:results} gives an example of how to create a table.
-
+\\
+\\
+In Table~\ref{tab:acid_compliance} you can see where redis and Neo4j differ in terms of ACID compliance
 \begin{table}[bth]
-	\centering
-	\begin{tabular}{llrrrrrr}
-		Config & Property & States & Edges & Peak & E-Time & C-Time & T-Time
-		\\ \hline \hline
-		22-2 & A   &    7,944  &   22,419  &  6.6  \%  &  7 ms & 42.9\% &  485.7\% \\
-		22-2 & A   &    7,944  &   22,419  &  6.6  \%  &  7 ms & 42.9\% &  471.4\% \\
-		30-2 & B   &   14,672  &   41,611  &  4.9  \%  & 14 ms & 42.9\% &  464.3\% \\
-		30-2 & C   &   14,672  &   41,611  &  4.9  \%  & 15 ms & 40.0\% &  420.0\% \\ \hline
-		10-3 & D   &   24,052  &   98,671  & 19.8  \%  & 35 ms & 31.4\% &  285.7\% \\
-		10-3 & E   &   24,052  &   98,671  & 19.8  \%  & 35 ms & 34.3\% &  308.6\% \\
-		\hline \hline
-	\end{tabular}
-	\caption{Selected experimental results on the communication protocol example.}
-	\label{tab:results}
+    \centering
+        \begin{tabular}{l|c|c}
+        \textbf{ACID Property} & \textbf{Redis} & \textbf{Neo4j} \\ 
+        \hline
+        \textbf{Atomicity} & Partial & Full \\
+        \hline
+        \textbf{Consistency} & Limited & Strong \\
+        \hline
+        \textbf{Isolation} & Yes & Yes \\
+        \hline
+        \textbf{Durability} & Weak & Durable \\
+        \hline
+    \end{tabular}
+    \caption{ACID compliance}
+    \label{tab:acid_compliance}
 \end{table}
-\\
-\\
