@@ -22,7 +22,7 @@ import java.util.List;
 public class PollManager {
 
     private static int userIdCounter = 1;
-    private static int pollIdCounter = 1;
+    private static Long pollIdCounter = 1L;
 
     private final PollCache pollCache;
 
@@ -46,7 +46,8 @@ public class PollManager {
         this.pollCache = pollCache;
     }
 
-    public void createPoll(Poll poll, String userId) {
+    public Poll createPoll(Poll poll, String userId) {
+        poll.setId(pollIdCounter++);
         poll.setPollId(String.valueOf(poll.getId()));
         poll.setPublishedAt(Instant.now());
         poll.setCreatedBy(userId);
@@ -61,6 +62,7 @@ public class PollManager {
             results.add(new OptionVote(option.getCaption(), 0));
         }
         pollCache.savePoll(new PollAggregate(poll.getId(), results, LocalDateTime.now()));
+        return poll;
     }
 
     public Collection<Poll> getAllPolls() {

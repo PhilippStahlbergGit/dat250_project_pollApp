@@ -24,15 +24,14 @@ import com.example.experiment1.domain.VoteOption;
 public class PollController {
     PollManager pollManager;
     RabbitMQPollService rabbitMQPollService;
-    private static int pollIdCounter = 1;
 
     public PollController(PollManager pollManager) {
         this.pollManager = pollManager;
     }
 
     @PostMapping("{userId}")
-    public void createPoll(@RequestBody Poll poll, @PathVariable String userId) {
-        pollManager.createPoll(poll, userId);
+    public Poll createPoll(@RequestBody Poll poll, @PathVariable String userId) {
+        return pollManager.createPoll(poll, userId);
     }
 
     @GetMapping
