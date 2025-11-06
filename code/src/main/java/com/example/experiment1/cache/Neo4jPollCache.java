@@ -39,8 +39,19 @@ public class Neo4jPollCache implements PollCache {
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
             return new PollAggregate(pollId, new ArrayList<>(), LocalDateTime.now());
         });
-        aggregate.getResults().removeIf(ov -> ov.getOption().equals(option));
-        aggregate.getResults().add(new OptionVote(option, count));
+        List<OptionVote> results = aggregate.getResults();
+        boolean found = false;
+        for (OptionVote ov : results) {
+            if (ov.getOption().equals(option)) {
+                int newCount = Math.max(0, ov.getVotes() + count);
+                ov.setVotes(newCount);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            results.add(new OptionVote(option, Math.max(0, count)));
+        }
         aggregate.setLastUpdated(LocalDateTime.now());
         repo.save(aggregate);
     }
@@ -63,17 +74,6 @@ public class Neo4jPollCache implements PollCache {
         });
     }
 
-    public static void main(String... args) {
-        final String dbUri = ("bolt://localhost:7687");
-        final String dbUser = ("neo4j");
-        final String dbPassword = ("supersecret");
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-            System.out.println("Connection established");
-            driver.close();
-        }
-    }
 
     @Override
     public void savePoll(PollAggregate pollAggregate) {

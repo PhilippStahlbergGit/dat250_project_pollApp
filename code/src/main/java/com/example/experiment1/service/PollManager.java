@@ -87,28 +87,36 @@ public class PollManager {
     }
 
     public void createVote(Vote vote, String userId, Long pollId) {
-        vote.setUserId(userId);
-        vote.setPollId(pollId.toString());
-        vote.setPublishedAt(Instant.now());
-        String key = vote.getUserId() + ":" + vote.getPollId();
-        Vote oldVote = this.getVotes().put(key, vote);
+    vote.setUserId(userId);
+    vote.setPollId(pollId.toString());
+    vote.setPublishedAt(Instant.now());
 
-        Poll poll = this.getPolls().get(pollId);
-        if (poll != null && poll.getOptions() != null) {
-            int newIdx = vote.getOptionIndex() - 1;
-            String optionCaption = poll.getOptions().get(newIdx).getCaption();
+    String key = userId + ":" + pollId;
+    Vote oldVote = this.getVotes().put(key, vote);
 
-            // Decrement old vote in cache
-            if (oldVote != null) {
-                int oldIdx = oldVote.getOptionIndex() - 1;
+    Poll poll = this.getPolls().get(pollId);
+    if (poll != null && poll.getOptions() != null) {
+        // Correct index handling
+        int newIdx = vote.getOptionIndex() - 1; // user gives 1-based index
+        if (newIdx < 0 || newIdx >= poll.getOptions().size()) {
+            throw new IllegalArgumentException("Invalid option index: " + vote.getOptionIndex());
+        }
+        String optionCaption = poll.getOptions().get(newIdx).getCaption();
+
+        // Decrement old vote in cache if it exists
+        if (oldVote != null) {
+            int oldIdx = oldVote.getOptionIndex() - 1;
+            if (oldIdx >= 0 && oldIdx < poll.getOptions().size()) {
                 String oldCaption = poll.getOptions().get(oldIdx).getCaption();
                 pollCache.updateVote(pollId, oldCaption, -1);
             }
-
-            // Increment new vote in cache
-            pollCache.updateVote(pollId, optionCaption, 1);
         }
+
+        // Increment new vote in cache
+        pollCache.updateVote(pollId, optionCaption, 1);
     }
+}
+
 
     public User createUser(User user) {
         user.setUserId(String.valueOf(userIdCounter++));

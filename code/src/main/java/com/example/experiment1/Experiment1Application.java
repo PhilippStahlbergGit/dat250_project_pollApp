@@ -14,6 +14,7 @@ public class Experiment1Application {
 
 
         // use port 32806 for the cache in neo4j desktop
+        // CORRECTION: the port changes every time you start the cache, run docker ps to see the port mapping, i.e. something like 32794-7474/tcp, where 32794 is the port to use 
     }
 
 }
