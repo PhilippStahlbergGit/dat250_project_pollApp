@@ -24,6 +24,7 @@ public class RabbitMQPollService {
             System.out.println("[x] Connected to RabbitMQ");
         } catch (Exception e) {
             System.err.println("[ERROR] Failed to connect to RabbitMQ");
+            System.err.println(e.getMessage());
         }
     }
     

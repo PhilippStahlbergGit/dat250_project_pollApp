@@ -29,6 +29,8 @@ public class PollManager {
     private Map<String, User> users = new HashMap<>();
     private Map<Long, Poll> polls = new HashMap<>();
     private Map<String, Vote> votes = new HashMap<>();
+    
+    private RabbitMQPollService rabbitMQPollService = new RabbitMQPollService();
 
     public Map<String, User> getUsers() {
         return users;
@@ -62,6 +64,9 @@ public class PollManager {
             results.add(new OptionVote(option.getCaption(), 0));
         }
         pollCache.savePoll(new PollAggregate(poll.getId(), results, LocalDateTime.now()));
+
+        // post to rabbitmq
+        rabbitMQPollService.publishPollCreated(poll.getId().toString(), poll.getQuestion(), userId);
         return poll;
     }
 
@@ -114,6 +119,9 @@ public class PollManager {
 
         // Increment new vote in cache
         pollCache.updateVote(pollId, optionCaption, 1);
+
+        // publish to rabbitmq
+        rabbitMQPollService.publishVoteCreated(vote.getPollId(), newIdx, optionCaption, userId);
     }
 }
 

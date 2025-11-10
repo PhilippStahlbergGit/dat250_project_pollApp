@@ -1,5 +1,6 @@
 package com.example.experiment1.cache;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.experiment1.domain.OptionVote;
 import com.example.experiment1.domain.PollAggregate;
 import com.example.experiment1.repository.PollCacheRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DeliverCallback;
+
+import jakarta.annotation.PostConstruct;
 
 // terminal command to run the docker container on linux (if other OS remove "sudo")
 // sudo docker run \
@@ -27,7 +36,13 @@ import com.example.experiment1.repository.PollCacheRepository;
 @Service
 public class Neo4jPollCache implements PollCache {
 
+    private static final String EXCHANGE_NAME = "poll_exchange";
     private final PollCacheRepository repo;
+    private final ConnectionFactory rabbitFactory = new ConnectionFactory();
+    private Connection rabbitConnection; 
+    private Channel rabbitChannel;
+    private final ObjectMapper mapper = new ObjectMapper();
+
 
     public Neo4jPollCache(PollCacheRepository repo) {
         this.repo = repo;
@@ -83,6 +98,33 @@ public class Neo4jPollCache implements PollCache {
     @Override
     public void removePoll(Long pollId) {
         repo.deleteById(pollId);
+    }
+
+    @PostConstruct
+    public void startSubscriber() {
+        try {
+            rabbitFactory.setHost("localhost");
+            rabbitConnection = rabbitFactory.newConnection();
+            rabbitChannel = rabbitConnection.createChannel();
+            rabbitChannel.exchangeDeclare(EXCHANGE_NAME, "topic");
+
+            String queueName = rabbitChannel.queueDeclare().getQueue();
+            rabbitChannel.queueBind(queueName, EXCHANGE_NAME, "poll.*.vote");
+
+            DeliverCallback deliver = (consumerTag, delivery) -> {
+                String body = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            try {
+                JsonNode node = mapper.readTree(body);
+                String pollId = node.path("pollId").asText(null);
+                String optionCaption = node.path("optionCaption").asText(null);
+                updateVote(Long.valueOf(pollId), optionCaption, 1);
+                
+            } catch (Exception e) {
+                System.err.println("Invalid message");
+            }
+        };
+        rabbitChannel.basicConsume(queueName, true, deliver, consumerTag -> { });
+    } catch (Exception e) {System.err.println("Error");}
     }
 
 }
