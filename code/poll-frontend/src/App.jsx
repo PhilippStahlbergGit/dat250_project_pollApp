@@ -28,7 +28,7 @@ function App() {
       .then(data => setPolls(data))
 
     }, [])
-
+ // Loggin in, utilizing /me inside the controller to login.
   const handleLogin = (e) => {
     e.preventDefault()
     const credentials = btoa(`${username}:${password}`);
@@ -49,7 +49,7 @@ function App() {
     })
     .catch(() => alert("Login failed. Check username and password."))
   }
-
+  // creating the users within /users controller path
   const handleCreateUser = (e) => {
     e.preventDefault()
     fetch("/users", {
@@ -66,7 +66,7 @@ function App() {
       })
       .catch(() => alert("Failed to create user"))
   }
-
+  // handle the creation of polls, 1) users must be logged in, 2) using these cred. one can create a poll via /polls
   const handleCreatePolls = (e) => {
     e.preventDefault()
     if(!user) {
@@ -105,7 +105,7 @@ function App() {
     .catch(() => alert("Failed to connect to backend"))
       
   }
-
+  // handling the vote, 1) once again the users must be logged in, 2) using this info we create a vote under /vote. Beware: Not all user.role can create votes!
   const handleVote = (pollId, optionIdx) => {
     if(!user || !username || !password || !user.id) {
       alert("You must be logged in to vote.");
