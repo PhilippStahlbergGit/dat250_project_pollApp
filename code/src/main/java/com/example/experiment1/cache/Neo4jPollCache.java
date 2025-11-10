@@ -112,17 +112,8 @@ public class Neo4jPollCache implements PollCache {
             rabbitChannel.queueBind(queueName, EXCHANGE_NAME, "poll.*.vote");
 
             DeliverCallback deliver = (consumerTag, delivery) -> {
-                String body = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            try {
-                JsonNode node = mapper.readTree(body);
-                String pollId = node.path("pollId").asText(null);
-                String optionCaption = node.path("optionCaption").asText(null);
-                updateVote(Long.valueOf(pollId), optionCaption, 1);
-                
-            } catch (Exception e) {
-                System.err.println("Invalid message");
-            }
-        };
+                String body = new String(delivery.getBody(), StandardCharsets.UTF_8); 
+        }; 
         rabbitChannel.basicConsume(queueName, true, deliver, consumerTag -> { });
     } catch (Exception e) {System.err.println("Error");}
     }
