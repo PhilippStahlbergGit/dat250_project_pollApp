@@ -3,12 +3,9 @@ package com.example.experiment1.cache;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.GraphDatabase;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.experiment1.domain.OptionVote;
 import com.example.experiment1.domain.PollAggregate;
 import com.example.experiment1.repository.PollCacheRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -41,7 +36,6 @@ public class Neo4jPollCache implements PollCache {
     private final ConnectionFactory rabbitFactory = new ConnectionFactory();
     private Connection rabbitConnection; 
     private Channel rabbitChannel;
-    private final ObjectMapper mapper = new ObjectMapper();
 
 
     public Neo4jPollCache(PollCacheRepository repo) {
@@ -75,16 +69,20 @@ public class Neo4jPollCache implements PollCache {
     public List<OptionVote> getAggregatedResults(Long pollId) {
         return repo.findById(pollId)
                 .map(PollAggregate::getResults)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found: " + pollId));
+                .orElse(null);
     }
 
     @Override
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000) // check every minute
+    // @Scheduled (fixedRate = 10000) // for testing, check every 10 seconds
     public void cleanStaleAggregates() {
+        System.out.println("Checking stale aggregates....");
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        // LocalDateTime cutoff = LocalDateTime.now(); // for testing
         repo.findAll().forEach(aggregate -> {
             if (aggregate.getLastUpdated().isBefore(cutoff)) {
-                repo.delete(aggregate);
+                repo.deleteAggregateWithOptions(aggregate.getPollId());
+                System.out.println("Deleted stale aggregate and its options: " + aggregate.getPollId());
             }
         });
     }

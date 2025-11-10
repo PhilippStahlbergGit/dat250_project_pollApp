@@ -73,6 +73,9 @@ public class PollManager {
     public Collection<Poll> getAllPolls() {
         for (Poll poll : this.getPolls().values()) {
             List<OptionVote> aggregatedResults = pollCache.getAggregatedResults(poll.getId());
+            if (aggregatedResults == null) {
+                continue;
+            }
             for (VoteOption option : poll.getOptions()) {
                 option.setVotes(aggregatedResults.stream()
                         .filter(ov -> ov.getOption().equals(option.getCaption()))

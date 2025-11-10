@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.neo4j.core.schema.Node;
-
+import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.schema.Id;
 
 @Node
@@ -13,6 +13,7 @@ public class PollAggregate {
 
     @Id
     private final Long pollId;
+    @Relationship(type = "HAS_OPTION", direction = Relationship.Direction.OUTGOING)
     private final List<OptionVote> results;
     private LocalDateTime lastUpdated;
 
@@ -24,6 +25,10 @@ public class PollAggregate {
 
     public List<OptionVote> getResults() {
         return results;
+    }
+
+    public Long getPollId() {
+        return pollId;
     }
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
