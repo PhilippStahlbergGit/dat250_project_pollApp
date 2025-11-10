@@ -1,6 +1,42 @@
 \section{Prototype Implementation}
 \label{sec:implementation}
+Let us start with the general implementation of the application, where we have our src folder, this is the backend, and the poll-frontend, being respectively the frontend.
 
+\subsection{Frontend}
+The frontend is Vite and React, where it is a single-page application using React where the core domain logic is within App.jsx.
+Using Reacts useState  we can keep track of Polls, votes, users and even users login status also anything else that needs to be kept track of that is dynamic.
+Handles users interaction; 1) creation of users, 2) creation of polls and 3) voting. Creation of Polls is set to users that have the role of ADMIN but this is checked from the backend using the credentials used from here. How is it handled in the frontend? If the user is not of ADMIN [role], then it does not give them the button to create a poll (see image).
+\lstinputlisting[language=html]{code/short_sample_of_app_jsx.html}
+
+Also upon voting and creation of polls one obviously needs to be logged in, so this is handled.
+Then it uses fetch in functions to make request for creating users, creating polls, voting and more.
+
+\subsection{Backend}
+(Needs to be adjusted after we have merged the two branches together! )
+
+\subsection{Security}
+
+Here we will go trough to our implementation of the security aspect of the project, starting off with our Role.java enum which is simple, and where a USER can have the Role of "NORMAL" or "ADMIN".
+
+Now that we have this Role, we can use it in our User class that each User has a role, or just set it as a Set of Role(s).
+Then our most important part (perhaps) is the webconfig, this in turns dictates what is required to access certain information.
+\lstinputlisting[language=java]{code/WebSecurityConfig_shorter.java}
+The code is quite easy to understand, as i have added quite useful comments to it, the most important takeaway, is that ADMIN roles are allowed to create and delete Polls and the rest both Normal and Admin users can do. 
+
+Inside the User controller we have a /me path, to easily retrieve information, like username authentication (role) and password. 
+
+Then to have things secure in our application we can easily just add the 	@PreAuthorize("hasRole('ADMIN')") for the POST and DELETE requests inside the PollController, the rest are after the requirements of the `WebSecurityConfig.java` file.
+Now the ADMIN is created at the start of the application.
+This way an ADMIN must be preconfigured to be made at startup, and in the command-line one can see the password and username set, which they can use to directly log in if wanted.
+
+
+
+
+\subsection{Cache Implementation}
+@Runar needs to write this part.
+
+
+EXAMPLE SCRIPT BELOW.
 This section should provide brief details of how the prototype has been implemented.
 You may want to use come code snippets here, but only focus on core features and aspects.
 You are not meant to copy/paste your whole application code into the report.
