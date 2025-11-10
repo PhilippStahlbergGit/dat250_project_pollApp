@@ -1,0 +1,13 @@
+            <div>
+              <h2>Welcome, {user?.username}</h2>
+              {user && user.roles.includes('ADMIN') && (
+                <div className="createPollComponent">
+                  <h2>Create poll</h2>
+                  <form onSubmit={handleCreatePolls}>
+                    <input type="text" placeholder="Question" value={question} onChange={e => setQuestion(e.target.value)} required/>
+                    <input type="text" placeholder="Option" value={option1} onChange={e => setOption1(e.target.value)} required/>
+                    <input type="text" placeholder="Option" value={option2} onChange={e => setOption2(e.target.value)} required/>
+                    <button type="submit">Submit</button>
+                  </form>
+                </div>
+              )}
