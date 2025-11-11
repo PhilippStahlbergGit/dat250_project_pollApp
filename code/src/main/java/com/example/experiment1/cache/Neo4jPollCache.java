@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.experiment1.domain.OptionVote;
+import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.PollAggregate;
+import com.example.experiment1.domain.Vote;
 import com.example.experiment1.repository.PollCacheRepository;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -37,17 +41,24 @@ public class Neo4jPollCache implements PollCache {
     private Connection rabbitConnection; 
     private Channel rabbitChannel;
 
-
     public Neo4jPollCache(PollCacheRepository repo) {
         this.repo = repo;
     }
 
     @Transactional
     @Override
-    public void updateVote(Long pollId, String option, int count) {
+    public void updateVote(Long pollId, String option, int count, Map<Long,PollAggregate> pollAggregates) {
+        // if poll is not saved in cache
         PollAggregate aggregate = repo.findById(pollId).orElseGet(() -> {
+            // fill up results list from previous results stored in database
+
+            PollAggregate existingAggregate = pollAggregates.get(pollId);
+            if (existingAggregate != null) {
+                return existingAggregate;
+            }
             return new PollAggregate(pollId, new ArrayList<>(), LocalDateTime.now());
         });
+    
         List<OptionVote> results = aggregate.getResults();
         boolean found = false;
         for (OptionVote ov : results) {
@@ -58,6 +69,7 @@ public class Neo4jPollCache implements PollCache {
                 break;
             }
         }
+        // if option is not saved in cache, i.e. no votes are registered for this option yet
         if (!found) {
             results.add(new OptionVote(option, Math.max(0, count)));
         }
@@ -73,12 +85,12 @@ public class Neo4jPollCache implements PollCache {
     }
 
     @Override
-    @Scheduled(fixedRate = 60000) // check every minute
-    // @Scheduled (fixedRate = 10000) // for testing, check every 10 seconds
+    // @Scheduled(fixedRate = 60000) // check every minute
+    @Scheduled (fixedRate = 10000) // for testing, check every 10 seconds
     public void cleanStaleAggregates() {
         System.out.println("Checking stale aggregates....");
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
-        // LocalDateTime cutoff = LocalDateTime.now(); // for testing
+        // LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime cutoff = LocalDateTime.now(); // for testing
         repo.findAll().forEach(aggregate -> {
             if (aggregate.getLastUpdated().isBefore(cutoff)) {
                 repo.deleteAggregateWithOptions(aggregate.getPollId());
@@ -96,6 +108,11 @@ public class Neo4jPollCache implements PollCache {
     @Override
     public void removePoll(Long pollId) {
         repo.deleteById(pollId);
+    }
+
+    @Override
+    public PollAggregate getPoll(Long pollId) {
+        return repo.findById(pollId).orElse(null);
     }
 
     @PostConstruct

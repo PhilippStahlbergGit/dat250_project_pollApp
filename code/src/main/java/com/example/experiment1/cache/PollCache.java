@@ -14,8 +14,9 @@ public interface PollCache {
      * @param pollId the poll ID
      * @param option the option being voted on
      * @param count  the number of votes (can be negative to decrement)
+     * @param pollAggregates 
      */
-    void updateVote(Long pollId, String option, int count);
+    void updateVote(Long pollId, String option, int count, Map<Long,PollAggregate> pollAggregates);
 
     /**
      * Get aggregated results for a given poll.
@@ -43,4 +44,13 @@ public interface PollCache {
      * @param pollId the poll ID to remove
      */
     void removePoll(Long pollId);
+
+
+    /**
+     * Retrieve a poll aggregate from the cache.
+     * 
+     * @param pollId the poll ID to retrieve
+     * @return the PollAggregate object, or null if not found
+     */
+    PollAggregate getPoll(Long pollId);
 }

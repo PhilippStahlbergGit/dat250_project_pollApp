@@ -29,6 +29,7 @@ public class PollManager {
     private Map<String, User> users = new HashMap<>();
     private Map<Long, Poll> polls = new HashMap<>();
     private Map<String, Vote> votes = new HashMap<>();
+    private Map<Long, PollAggregate> pollAggregates = new HashMap<>();
     
     private RabbitMQPollService rabbitMQPollService = new RabbitMQPollService();
 
@@ -63,7 +64,9 @@ public class PollManager {
         for (VoteOption option : poll.getOptions()) {
             results.add(new OptionVote(option.getCaption(), 0));
         }
-        pollCache.savePoll(new PollAggregate(poll.getId(), results, LocalDateTime.now()));
+        PollAggregate pollAggregate = new PollAggregate(poll.getId(), results, LocalDateTime.now());
+        pollCache.savePoll(pollAggregate);
+        this.pollAggregates.put(pollAggregate.getPollId(), pollAggregate);
 
         // post to rabbitmq
         rabbitMQPollService.publishPollCreated(poll.getId().toString(), poll.getQuestion(), userId);
@@ -73,7 +76,7 @@ public class PollManager {
     public Collection<Poll> getAllPolls() {
         for (Poll poll : this.getPolls().values()) {
             List<OptionVote> aggregatedResults = pollCache.getAggregatedResults(poll.getId());
-            if (aggregatedResults == null) {
+            if (aggregatedResults == null) { 
                 continue;
             }
             for (VoteOption option : poll.getOptions()) {
@@ -104,7 +107,6 @@ public class PollManager {
 
     Poll poll = this.getPolls().get(pollId);
     if (poll != null && poll.getOptions() != null) {
-        // Correct index handling
         int newIdx = vote.getOptionIndex() - 1; // user gives 1-based index
         if (newIdx < 0 || newIdx >= poll.getOptions().size()) {
             throw new IllegalArgumentException("Invalid option index: " + vote.getOptionIndex());
@@ -116,12 +118,16 @@ public class PollManager {
             int oldIdx = oldVote.getOptionIndex() - 1;
             if (oldIdx >= 0 && oldIdx < poll.getOptions().size()) {
                 String oldCaption = poll.getOptions().get(oldIdx).getCaption();
-                pollCache.updateVote(pollId, oldCaption, -1);
+                pollCache.updateVote(pollId, oldCaption, -1, pollAggregates);
             }
         }
 
         // Increment new vote in cache
-        pollCache.updateVote(pollId, optionCaption, 1);
+        pollCache.updateVote(pollId, optionCaption, 1, pollAggregates);
+
+        // replace pollaggregate in map
+        PollAggregate updatedAggregate = pollCache.getPoll(pollId);
+        this.pollAggregates.put(pollId, updatedAggregate);
 
         // publish to rabbitmq
         rabbitMQPollService.publishVoteCreated(vote.getPollId(), newIdx, optionCaption, userId);

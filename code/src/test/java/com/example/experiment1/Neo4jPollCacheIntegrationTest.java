@@ -52,7 +52,7 @@ public class Neo4jPollCacheIntegrationTest {
         PollAggregate aggregate = new PollAggregate(2L, results, LocalDateTime.now());
         pollCache.savePoll(aggregate);
 
-        pollCache.updateVote(2L, "Red", 1);
+        pollCache.updateVote(2L, "Red", 1, new HashMap<>());
         List<OptionVote> updated = pollCache.getAggregatedResults(2L);
 
         assertEquals(1, updated.get(1).getVotes());
