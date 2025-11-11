@@ -1,0 +1,21 @@
+<<<<<<< HEAD
+#*.pdf // remove comment once you have cloned the repository
+*.log
+*.blg
+*.bbl
+*.aux
+report.synctex.gz
+report.out
+report.pdf
+=======
+#*.pdf // remove comment once you have cloned the repository
+*.log
+*.blg
+*.bbl
+*.aux
+report.synctex.gz
+report.out
+report.pdf
+settings.json
+testdb.mv.db
+>>>>>>> neo4j

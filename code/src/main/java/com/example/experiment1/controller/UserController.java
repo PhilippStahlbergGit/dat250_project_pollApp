@@ -1,14 +1,11 @@
 package com.example.experiment1.controller;
-import com.example.experiment1.domain.Role;
-import com.example.experiment1.domain.User;
-import com.example.experiment1.security.UserRepository;
 
+import com.example.experiment1.domain.User;
+
+import org.springframework.security.core.Authentication;
 import java.util.Collection;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,20 +13,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.experiment1.service.PollManager;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PollManager pollManager;
 
-    private static int userIdCounter = 1;
 
-    // retrive the USER and thereby we cna find the role of the user later also.
+    // TODO: Change this function to be inside the PollManager.class later
     @GetMapping("/me")
     public User getLoggedInUser(Authentication authentication) {
         if (authentication == null) {
@@ -41,16 +40,12 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        user.setUserId(String.valueOf(userIdCounter++));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(Set.of(Role.NORMAL));
-        }
-        return userRepository.save(user);
+        return pollManager.createUser(user);
     }
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return (Collection<User>) userRepository.findAll();
+        return pollManager.getUsers().values();
     }
+
 }

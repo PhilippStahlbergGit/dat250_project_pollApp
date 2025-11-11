@@ -6,3 +6,5 @@
 report.synctex.gz
 report.out
 report.pdf
+settings.json
+testdb.mv.db

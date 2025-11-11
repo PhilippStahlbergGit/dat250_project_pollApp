@@ -1,4 +1,3 @@
-
 import org.gradle.internal.impldep.org.jsoup.nodes.Document
 
 plugins {
@@ -6,6 +5,8 @@ plugins {
 	id("org.springframework.boot") version "3.5.5"
 	id("io.spring.dependency-management") version "1.1.7"
     jacoco
+    id("me.champeau.jmh") version "0.7.2"
+
 }
 
 group = "com.example"
@@ -42,17 +43,21 @@ dependencies {
 	implementation("redis.clients:jedis:6.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("com.rabbitmq:amqp-client:5.20.0")
-
-	// try adding jpa starter kit
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	// starter kit for neu4j (spring fixes version)
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
-	// security added, basic spring handled one, security add later
-	implementation("org.springframework.boot:spring-boot-starter-security") 
+	implementation("org.testcontainers:testcontainers:1.20.0")
+	implementation("org.testcontainers:neo4j:1.20.0")
+    jmh("org.openjdk.jmh:jmh-core:1.37")
+    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+
+
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
-
+jmh {
+    zip64 = true
+}
 

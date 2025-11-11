@@ -1,6 +1,3 @@
-package com.example.experiment1.controller;
-
-import java.time.Instant;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,74 +13,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.experiment1.service.PollManager;
 import com.example.experiment1.service.RabbitMQPollService;
-import com.example.experiment1.service.RedisPollService;
 import com.example.experiment1.domain.Poll;
-import com.example.experiment1.domain.VoteOption;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/polls")
 public class PollController {
-	@Autowired
-	PollManager pollManager;
-	@Autowired
-	RedisPollService redisPollService;
-	@Autowired
-	RabbitMQPollService rabbitMQPollService;
-	private static int pollIdCounter = 1;
+    PollManager pollManager;
+    RabbitMQPollService rabbitMQPollService;
 
-	// only admins can create a Poll
-	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("{userId}")
-	public void createPoll(@RequestBody Poll poll, @PathVariable String userId) {
+    public PollController(PollManager pollManager) {
+        this.pollManager = pollManager;
+    }
 
-		poll.setPollId(String.valueOf(pollIdCounter++));
-		poll.setPublishedAt(Instant.now());
-		poll.setCreatedBy(userId);
-		if (poll.getValidUntil() == null) {
-			poll.setValidUntil(Instant.now().plusSeconds(86400));
-		}
-		pollManager.getPolls().put(poll.getPollId(), poll);
+    // only admins can delete a Poll
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("{userId}")
+    public Poll createPoll(@RequestBody Poll poll, @PathVariable String userId) {
+        return pollManager.createPoll(poll, userId);
+    }
 
-		if (redisPollService.isRedisAvailable()) {
-			redisPollService.storePollMetadata(poll.getPollId(), poll.getQuestion());
-			if (poll.getOptions() != null) {
-				for (VoteOption option : poll.getOptions()) {
-					redisPollService.setVoteCount(poll.getPollId(), option.getCaption(), 0);
-				}
-			}
-		}
+    @GetMapping
+    public Collection<Poll> getAllPolls() {
+        return pollManager.getAllPolls();
+    }
 
-		rabbitMQPollService.publishPollCreated(poll.getPollId(), poll.getQuestion(), userId);
-	}
-
-	@GetMapping
-	public Collection<Poll> getAllPolls() {
-		for (Poll poll : pollManager.getPolls().values()) {
-			// Reset votes for each option
-			for (VoteOption option : poll.getOptions()) {
-				option.setVotes(0);
-			}
-			// Count votes for each option
-			pollManager.getVote().values().stream()
-					.filter(v -> v.getPollId().equals(poll.getPollId()))
-					.forEach(v -> {
-						int idx = v.getOptionIndex() - 1; // 1-based index
-						if (idx >= 0 && idx < poll.getOptions().size()) {
-							poll.getOptions().get(idx).setVotes(
-									poll.getOptions().get(idx).getVotes() + 1);
-						}
-					});
-		}
-		return pollManager.getPolls().values();
-	}
-
-	// only admins can delete a Poll
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("delete/{pollId}")
-	public void deletePoll(@PathVariable String pollId) {
-		pollManager.getPolls().remove(pollId);
-		// Remove all votes on this poll
-		pollManager.getVote().entrySet().removeIf(entry -> entry.getKey().endsWith(":" + pollId));
-	}
+    // only admins can delete a Poll
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("delete/{pollId}")
+    public void deletePoll(@PathVariable Long pollId) {
+        pollManager.deletePoll(pollId);
+    }
 }
