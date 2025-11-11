@@ -1,9 +1,7 @@
 package com.example.experiment1.controller;
 
-import java.time.Instant;
 import java.util.Collection;
 
-import com.example.experiment1.service.RabbitMQPollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

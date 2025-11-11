@@ -6,16 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.experiment1.domain.OptionVote;
-import com.example.experiment1.domain.Poll;
 import com.example.experiment1.domain.PollAggregate;
-import com.example.experiment1.domain.Vote;
 import com.example.experiment1.repository.PollCacheRepository;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -85,12 +81,12 @@ public class Neo4jPollCache implements PollCache {
     }
 
     @Override
-    // @Scheduled(fixedRate = 60000) // check every minute
-    @Scheduled (fixedRate = 10000) // for testing, check every 10 seconds
+    @Scheduled(fixedRate = 60000) // check every minute
+    // @Scheduled (fixedRate = 10000) // for testing, check every 10 seconds
     public void cleanStaleAggregates() {
         System.out.println("Checking stale aggregates....");
-        // LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
-        LocalDateTime cutoff = LocalDateTime.now(); // for testing
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        // LocalDateTime cutoff = LocalDateTime.now(); // for testing
         repo.findAll().forEach(aggregate -> {
             if (aggregate.getLastUpdated().isBefore(cutoff)) {
                 repo.deleteAggregateWithOptions(aggregate.getPollId());

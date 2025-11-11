@@ -67,6 +67,6 @@ public class Neo4jPollCacheIntegrationTest {
 
         pollCache.removePoll(3L);
 
-        assertThatIllegalArgumentException().isThrownBy(() -> pollCache.getAggregatedResults(3L));
+        assertNull(pollCache.getAggregatedResults(3L));
     }
 }
