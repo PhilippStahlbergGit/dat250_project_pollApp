@@ -7,13 +7,15 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1, time = 1)
+@Warmup(iterations = 5, time = 2)
+@Measurement(iterations = 10, time = 2)
 @Fork(1)
 @State(Scope.Benchmark)
 public class Neo4jBenchmark {
     private Driver driver;
 
+    @Param({"1","10","100","1000","10000"})
+    private int recordCount;
     @Setup(Level.Trial)
     public void setup() {
         // Connect to Neo4j running in Docker
@@ -24,17 +26,24 @@ public class Neo4jBenchmark {
 
         // Insert one node for consistent reads
         try (Session session = driver.session()) {
-            session.run("MERGE (u:User {id: $id}) SET u.name = $name",
-                    Map.of("id", "1", "name", "Alice"));
+            //Clean up
+            session.run("MATCH (u:User) DELETE u");
+
+            for (int i = 0; i < recordCount; i++) {
+                session.run("MERGE (u:User {id: $id}) SET u.name = $name",
+                        Map.of("id", String.valueOf(i), "name", "Alice" + i));
+            }
+
         }
     }
     @Benchmark
     public void testNeo4jRead(){
         try (Session session = driver.session()) {
             session.run("MATCH (u:User {id: $id}) RETURN u",
-                    Map.of("id", "1")).list();
+                    Map.of("id", String.valueOf(recordCount))).list();
         }
     }
+
 
     @TearDown(Level.Trial)
     public void tearDown() {
