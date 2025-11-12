@@ -58,7 +58,15 @@ results are other kinds of tables that for instance compares
 technologies. Table~\ref{tab:results} gives an example of how to create a table.
 \\
 \\
-We want to do some benchmarking to compare Neo4j to Redis on performance. To do this we will use JMH (Java Microbenchmark Harness) this is described in \cite{jenkovJMH2023}
+We want to do some benchmarking to compare Neo4j to Redis on performance. To do this we will use JMH (Java Microbenchmark Harness) this is described in \cite{jenkovJMH2023} We did a benchmark where we could see the performance of Neo4j versus Redis for a simple read operation where we incremented the number of records in the database as you can see in Figure~\ref{fig:benchmark}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{benchmark_redis_vs_neo4j_read.png}
+    \caption{Benchmark of Read operation in Neo4j vs Redis}
+    \label{fig:benchmark}
+\end{figure}
+\\
+\\
 In Table~\ref{tab:acid_compliance} you can see where redis and Neo4j differ in terms of ACID compliance
 \begin{table}[bth]
     \centering
