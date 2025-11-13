@@ -1,106 +1,115 @@
-\section{Design, DETTE SKAL DU JOBBE MED}
+\section{Design}
 \label{sec:design}
 
 \subsection{The Use Cases}
-\label{sec:design}
+\label{sec:usecases}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{figs/Use_cases.drawio.png}
+    \includegraphics[width=0.5\textwidth]{figs/Final_Use_cases.png}
     \caption{Use cases}
-    \label{figs:logo}
+    \label{figs:usecases}
 \end{figure}
 
+The system has two types of users: admin users and regular users. 
+Admin users are predefined at start-up, with default credentials, allowing immediate login. 
+Regular users must create an account before they can log in. 
+Both user types can vote on polls, while only admin users can create new polls. 
+This design implements role-based authorization, ensuring appropriate access control and tying votes to verified accounts for fairness and security.
 
-For this project, we have two types of users; admin users and normal users. Both types of users must create an account before they can participate in polls. Admin users have additional permissions, such as creating and deleting polls, while normal users can only vote. We designed the system this way to implement role-based authorization, ensuring that each user role has the appropriate level of access and control within the application.
+\subsection{User Screens}
+\label{sec:screens}
 
-Admins are people that are then predefined, that means upon application start-up one can see in the terminal see the password and username (which often will be admin perhaps) tied to the admin user. That really just means that this user has a ADMIN-role, and can be logged on upon start-up without any registration (i.e no need to "create a user").
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figs/Login_screen.png}
+    \caption{Login screen}
+    \label{figs:login}
+\end{figure}
 
-If you’re gonna have the possibility to vote on our website, you have to create a user and log into this user to access the page. This is important because we don’t want people submitting multiple votes or accessing the voting system without proper authentication. Having user accounts ensures that each vote is tied to a verified identity, making the process fair and secure.
+Users can choose to log in or create a new account from the login page.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figs/Admin_screen.png}
+    \caption{Admin screen}
+    \label{figs:admin}
+\end{figure}
+
+The admin screen allows creating polls and voting on existing polls.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figs/User_screen.png}
+    \caption{User screen}
+    \label{figs:user}
+\end{figure}
+
+The user screen allows registered users to vote on existing polls.
 
 \subsection{The Domain Model}
 \label{sec:design}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{figs/Current_domain_model.drawio (1).png}
+    \includegraphics[width=0.7\textwidth]{figs/Final_domain_model.png}
     \caption{Domain Model}
     \label{figs:logo}
 \end{figure}
 
+The domain model consists of several key entities that manage users, polls, votes, and vote options. 
 
+Each poll must have exactly two options. This restriction ensures that the poll remains meaningful, as a poll with only a single option would not make sense. Admin users are not permitted to add additional options beyond these two.
 
-When it comes to the domain model. there is several different things we have to look after. 
-
-The polls has to have at least two options. The reason for this is because it does not make sense to have a poll with only 1 option. However, the user can make as many options as he'd like for each poll. 
-
-Each user is allowed to vote for only one option per poll. This restriction is in place to prevent multiple votes from a single user, ensuring that the results remain accurate and fair. However, one could argue that in cases where a question has multiple valid answers, users should be able to select more than one option. Examples of such questions include “When would you like to have this week’s meeting?” or “Which ice cream flavors do you like the most?”. But for simplicity, we do not allow this. 
+Each user is allowed to vote for only one option per poll. This restriction is in place to prevent multiple votes from a single user, ensuring that the results remain accurate and fair. However, one could argue that in cases where a question has multiple valid answers, users should be able to select more than one option. Examples of such questions include “When would you like to have this week’s meeting?” or “Which ice cream flavors do you like the most?” For simplicity, this functionality is not supported.
 
 Each user can vote only once per poll. It is unnecessary for a single user to cast multiple votes for the same poll option, so the system ensures that only one vote per user is allowed.
 
-Here are the following entities in our application: 
+The following sections describe each entity in detail.
 
 \subsubsection{User entity}
 
+
 The User entity represents an application user and stores profile information and the polls the user has created. It is a persistent JPA entity and serves as the aggregate root for the user aggregate.
+
+
 The user domain consists of:
 
 \begin{itemize}
-
-\item \textbf{id:} Primary key, unique identifier for each user so the system can differentiate them (auto-generated). It is a Long.
-
-\item \textbf{userId:} A readable/public identifier for the user (String) suitable for links or external references (distinct from DB id).
-
-\item \textbf{username:} The display name of the user (String).
-
-\item \textbf{email:} The user's contact email (String).
-
-\item \textbf{created:} A set of Poll entities this user created (Set\<Poll\>). This is a one-to-many relationship (mappedBy = "createdByUser") with CascadeType.ALL and orphanRemoval = true in the current mapping.
-
-\item \textbf{roles:} A set of Roles which keeps track of the users and their respective roles (Set\<Role\>). This set gets changed as the users and their roles get adjusted. The user if not set explicitly has the $NORMAL$ role, then the other alternative is $ADMIN$. 
-
+    \item \textbf{id:} Primary key, unique identifier for each user (auto-generated, Long).
+    \item \textbf{userId:} Public identifier suitable for links or external references (String).
+    \item \textbf{username:} Display name of the user (String).
+    \item \textbf{password:} User's password for login and authentication (String).
+    \item \textbf{email:} Contact email (String).
+    \item \textbf{roles:} Set of roles assigned to the user (Set\<Role\>). Default role is $NORMAL$, alternative is $ADMIN$.
+    \item \textbf{created:} Set of Poll entities created by the user (Set\<Poll\>). One-to-many relationship with CascadeType.ALL and orphanRemoval = true.
+    \item \textbf{Domain methods:} 
+        \begin{itemize}
+            \item \texttt{createPoll(String):} Creates a new poll associated with this user and adds it to the \texttt{created} set.
+            \item \texttt{voteFor(VoteOption):} Creates a new vote for the specified vote option and associates it with this user.
+        \end{itemize}
 \end{itemize}
-
 
 \subsubsection{Poll entity}
 
-The poll entity is used for making the actual polls in the application. When you create a poll, it consists of a question and a list of possible answers (voteoptions). Users select one of these options when they are casting a vote. Poll acts therefore as a aggregate root for the voteoption entity. This entity acts as a aggregate root for the poll aggregate.
+The Poll entity represents a poll in the application, consisting of a question and a list of possible answers (VoteOption entities). Users select one of these options when casting a vote. Poll acts as the aggregate root for its VoteOption entities.
+
 
 The poll domain consists of:
 
 \begin{itemize}
-
-\item \textbf{id:} Primary key, unique identifier for each poll so the system can differentiate them (auto-generated). It is a Long. 
-
-\item \textbf{pollId:} A readable or public ID for the poll, used for links or references. It is a string.
-
-\item \textbf{question:} The question or statement that users are voting on.
-
-\item \textbf{options:} A list of VoteOption entities representing the possible answers or choices for the poll. This is a one-to-many relationship.
-
-\item \textbf{publishedAt:} Showing when the poll was published
-
-\item \textbf{validUntil:} Showing when the poll is valid (for example when voting closes).
-
-\item \textbf{createdBy:} The name or username of the person who created the poll, stored as plain text.
-
-\item \textbf{createdByUser:} A reference to the actual user in the system, represented as a @Manytoone relationship to the user entity. This is so you can access more information about the person who created the poll.
-
-\end{itemize}
-
-
-\subsubsection{Vote entity}
-
-The Vote entity represents a single vote cast by a user for a specific option in a poll. Each vote records which user voted, for which poll, and which option was selected. Vote acts as an entity in the domain model and is associated with a VoteOption. This entity is part of the poll aggregate.
-
-The vote domain consists of:
-\begin{itemize}
-\item \textbf{id:} Primary key, unique identifier for each vote so the system can differentiate them (auto-generated). It is a Long.
-\item \textbf{userId:} The identifier of the user who cast the vote, stored as a String.
-\item \textbf{pollId:} The identifier of the poll in which the vote was cast, stored as a String.
-\item \textbf{optionIndex:} The index of the option that was selected by the user (int).
-\item \textbf{publishedAt:} The timestamp showing when the vote was published (Instant).
-\item \textbf{votesOn:} A reference to the VoteOption entity that this vote is associated with. This is a many-to-one relationship.
+    \item \textbf{id:} Primary key, unique identifier for each poll (auto-generated, Long).
+    \item \textbf{pollId:} Public identifier suitable for links or references (String).
+    \item \textbf{question:} The question or statement that users are voting on (String).
+    \item \textbf{options:} List of VoteOption entities representing the possible answers (one-to-many relationship).
+    \item \textbf{publishedAt:} Timestamp indicating when the poll was published.
+    \item \textbf{validUntil:} Timestamp indicating when the poll is no longer valid (e.g., voting closes).
+    \item \textbf{createdBy:} Name or username of the person who created the poll (plain text).
+    \item \textbf{createdByUser:} Reference to the User entity who created the poll (@ManyToOne relationship).
+    \item \textbf{Domain methods:}
+        \begin{itemize}
+            \item \texttt{addVoteOption(String):} Adds a new option to the poll with the given caption, sets its presentation order, and returns the created \texttt{VoteOption} object.
+        \end{itemize}
 \end{itemize}
 
 \subsubsection{VoteOption entity}
@@ -109,26 +118,51 @@ The VoteOption entity represents a single possible answer or choice within a pol
 
 
 The voteOption domain consists of:
+
 \begin{itemize}
-\item \textbf{id:} Primary key, unique identifier for each vote option so the system can differentiate them (auto-generated). It is a Long.
-\item \textbf{caption:} The text or label describing the option (String).
-\item \textbf{presentationOrder:} The order in which this option is presented in the poll (int).
-\item \textbf{votes:} The number of votes this option has received (int).
-\item \textbf{poll:} A reference to the Poll entity that this option belongs to. This is a many-to-one relationship.
+    \item \textbf{id:} Primary key, unique identifier for each vote option (auto-generated, Long).
+    \item \textbf{caption:} Text or label describing the option (String).
+    \item \textbf{presentationOrder:} Order in which the option is presented in the poll (int).
+    \item \textbf{votes:} Number of votes received (int).
+    \item \textbf{poll:} Reference to the Poll entity this option belongs to (Many-to-one relationship).
+
+\end{itemize}
+
+\subsubsection{Vote entity}
+
+The Vote entity represents a single vote cast by a user for a specific option in a poll. Each vote records which user voted, for which poll, and which option was selected. Vote acts as an entity in the domain model and is associated with a VoteOption. This entity is part of the poll aggregate.
+The vote domain consists of:
+
+\begin{itemize}
+    \item \textbf{id:} Primary key, unique identifier for each vote (auto-generated, Long).
+    \item \textbf{userId:} Identifier of the user who cast the vote (String).
+    \item \textbf{pollId:} Identifier of the poll in which the vote was cast (String).
+    \item \textbf{optionIndex:} Index of the option selected by the user (int).
+    \item \textbf{publishedAt:} Timestamp indicating when the vote was cast (Instant).
+    \item \textbf{votesOn:} Reference to the VoteOption entity this vote is associated with (Many-to-one relationship).
+
 \end{itemize}
 
 
+\subsection{The Component architecture}
 
-\section{Resulting component architecture}
 
-Here is the following component architecture for our project:
+Here is the component architecture for our project:
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{figs/arkitektur_figur.drawio (1).png}
+    \includegraphics[width=0.5\textwidth]{figs/arkitektur_figur.drawio (1) (1).png}
     \caption{Our architecture}
     \label{figs:logo}
 \end{figure}
+
+Our software architecture consists of a React frontend built with Vite for a fast and interactive user interface. 
+The REST API, implemented with Spring Web MVC, serves as a bridge between the frontend and the core business logic, 
+which is handled by Spring components and services. 
+Data persistence is managed using the Jakarta Persistence API with Hibernate, storing application data in an H2 database. 
+For messaging, we use RabbitMQ. 
+Additionally, we use Neo4j instead of Redis for caching, which will be explained further in the technology section.
+
 
 
 
@@ -142,8 +176,6 @@ Concretely, you shall write about
 
 \begin{itemize}
 	\item the \emph{use cases},
-
-
 	\item the \emph{domain model}, and
 	\item the \emph{architecture} (including applied technologies)
 \end{itemize}
@@ -158,6 +190,9 @@ Each part shall ideally be accompanied with a graphical representation (diagram)
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
 
 
+
+
+You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
 
 
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
