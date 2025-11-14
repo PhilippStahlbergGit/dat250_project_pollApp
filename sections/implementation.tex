@@ -12,7 +12,18 @@ Also upon voting and creation of polls one obviously needs to be logged in, so t
 Then it uses fetch in functions to make request for creating users, creating polls, voting and more.
 
 \subsection{Backend}
-(Needs to be adjusted after we have merged the two branches together! )
+
+The backend is a Spring Boot application that provides a REST API for the frontend. The structure is organized into several key packages:
+
+\begin{itemize}
+    \item Domain: This package contains the data models (also known as entities) like User, Poll, and Vote.  Using JPA we can save all these entities into the H2 database directly to a table in the database. You are provided with all different functions and methods, using the $@data$ annotation, thereby effectively interacting with the user database.
+    \item Config, repository and cache: These are the folders mainly responsible for the caching Logic using neo4j.
+    \item Controller: This package exposes the API endpoints. Classes like UserController, PollController, and VoteController handle incoming HTTP requests from the frontend. For example, when you log in or create a poll, these controllers process that request. Using the springs annotations like $@GetMapping$, $@RequestMapping$ and $@PostMapping$
+    \item Security: This package manages user authentication and authorization using Spring Security. It ensures that users are who they say they are and controls access to different parts of the API. For instance, it restricts poll creation to users with an ADMIN role.
+    \item Service: This package holds the application's business logic. It includes the PollManager which is responsible for our controller logic for Polls and integrating with messaging systems like RabbitMQ.
+\end{itemize}
+
+
 
 \subsection{Security}
 
