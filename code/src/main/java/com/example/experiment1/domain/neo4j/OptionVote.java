@@ -1,4 +1,4 @@
-package com.example.experiment1.domain;
+package com.example.experiment1.domain.neo4j;
 
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;

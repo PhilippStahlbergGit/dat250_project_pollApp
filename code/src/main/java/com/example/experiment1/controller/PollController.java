@@ -1,3 +1,5 @@
+package com.example.experiment1.controller;
+
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.experiment1.domain.jpa.Poll;
 import com.example.experiment1.service.PollManager;
 import com.example.experiment1.service.RabbitMQPollService;
-import com.example.experiment1.domain.Poll;
 
 @CrossOrigin
 @RestController

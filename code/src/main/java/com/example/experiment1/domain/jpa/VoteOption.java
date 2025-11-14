@@ -1,6 +1,4 @@
-package com.example.experiment1.domain;
-
-import java.time.Instant;
+package com.example.experiment1.domain.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,23 +17,20 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "votes")
-public class Vote {
+@Table(name = "voteoptions")
+public class VoteOption {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	private String caption;
+	private int presentationOrder;
+	private int votes;
 
-    private String userId;
-    private String pollId;
-    private int optionIndex;
-    private Instant publishedAt;
-
-
-    @ToString.Exclude
+	// look at Poll for documentation on this
+	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-    @ManyToOne
-    @JoinColumn(name = "vote_option_id")
-    private VoteOption votesOn;
-    
+	@ManyToOne
+	@JsonBackReference("poll-option")
+	private Poll poll;
 }

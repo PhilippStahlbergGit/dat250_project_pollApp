@@ -1,8 +1,8 @@
 package com.example.experiment1.controller;
 
-import com.example.experiment1.domain.User;
+import com.example.experiment1.domain.jpa.User;
+import com.example.experiment1.repository.jpa.UserRepository;
 
-import com.example.experiment1.security.UserRepository;
 import org.springframework.security.core.Authentication;
 import java.util.Collection;
 

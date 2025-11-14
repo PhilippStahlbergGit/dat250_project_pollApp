@@ -1,11 +1,13 @@
 package com.example.experiment1.security;
 
-import com.example.experiment1.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.example.experiment1.domain.jpa.User;
+import com.example.experiment1.repository.jpa.UserRepository;
 
 import java.util.Optional;
 
