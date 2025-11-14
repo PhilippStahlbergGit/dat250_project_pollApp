@@ -1,17 +1,20 @@
 package com.example.experiment1.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.experiment1.security.*;
-import com.example.experiment1.domain.*;
+import com.example.experiment1.domain.jpa.User;
+import com.example.experiment1.repository.jpa.UserRepository;
 
 
 
 @Controller
 public class LoginController {
 
+	@Autowired
 	private final UserRepository userRepository;
 
 	public LoginController(UserRepository userRepository) {

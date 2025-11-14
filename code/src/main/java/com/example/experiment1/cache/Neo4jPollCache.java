@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.experiment1.domain.OptionVote;
-import com.example.experiment1.domain.PollAggregate;
-import com.example.experiment1.repository.PollCacheRepository;
+import com.example.experiment1.domain.neo4j.OptionVote;
+import com.example.experiment1.domain.neo4j.PollAggregate;
+import com.example.experiment1.repository.neo4j.PollCacheRepository;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -41,7 +41,7 @@ public class Neo4jPollCache implements PollCache {
         this.repo = repo;
     }
 
-    @Transactional
+    @Transactional("neo4jTransactionManager")
     @Override
     public void updateVote(Long pollId, String option, int count, Map<Long,PollAggregate> pollAggregates) {
         // if poll is not saved in cache

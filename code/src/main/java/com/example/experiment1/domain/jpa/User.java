@@ -1,16 +1,17 @@
-package com.example.experiment1.domain;
+package com.example.experiment1.domain.jpa;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.HashSet;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+
+import com.example.experiment1.domain.Role;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;

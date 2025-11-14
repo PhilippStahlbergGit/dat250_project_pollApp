@@ -1,4 +1,4 @@
-package com.example.experiment1.domain;
+package com.example.experiment1.domain.neo4j;
 
 import java.time.LocalDateTime;
 import java.util.List;

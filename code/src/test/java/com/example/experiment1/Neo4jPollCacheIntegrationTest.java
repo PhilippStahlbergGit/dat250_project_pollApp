@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.experiment1.cache.PollCache;
-import com.example.experiment1.domain.OptionVote;
-import com.example.experiment1.domain.PollAggregate;
+import com.example.experiment1.domain.neo4j.OptionVote;
+import com.example.experiment1.domain.neo4j.PollAggregate;
 
 @SpringBootTest
 public class Neo4jPollCacheIntegrationTest {

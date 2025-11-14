@@ -7,10 +7,10 @@ import jakarta.persistence.PersistenceConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.example.experiment1.domain.Poll;
-import com.example.experiment1.domain.User;
-import com.example.experiment1.domain.Vote;
-import com.example.experiment1.domain.VoteOption;
+import com.example.experiment1.domain.jpa.Poll;
+import com.example.experiment1.domain.jpa.User;
+import com.example.experiment1.domain.jpa.Vote;
+import com.example.experiment1.domain.jpa.VoteOption;
 
 import java.util.Arrays;
 import java.util.List;

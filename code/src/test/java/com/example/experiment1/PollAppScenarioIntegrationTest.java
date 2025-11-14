@@ -9,13 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-
-import com.example.experiment1.domain.Poll;
-import com.example.experiment1.domain.User;
-import com.example.experiment1.domain.Vote;
-import com.example.experiment1.domain.VoteOption;
-
 import org.springframework.web.client.RestClient;
+
+import com.example.experiment1.domain.jpa.Poll;
+import com.example.experiment1.domain.jpa.User;
+import com.example.experiment1.domain.jpa.Vote;
+import com.example.experiment1.domain.jpa.VoteOption;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PollAppScenarioIntegrationTest {

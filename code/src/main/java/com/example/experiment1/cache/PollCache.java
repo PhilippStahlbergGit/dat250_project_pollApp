@@ -3,8 +3,8 @@ package com.example.experiment1.cache;
 import java.util.List;
 import java.util.Map;
 
-import com.example.experiment1.domain.OptionVote;
-import com.example.experiment1.domain.PollAggregate;
+import com.example.experiment1.domain.neo4j.OptionVote;
+import com.example.experiment1.domain.neo4j.PollAggregate;
 
 public interface PollCache {
 

@@ -1,7 +1,8 @@
 package com.example.experiment1.security;
 
 import com.example.experiment1.domain.Role;
-import com.example.experiment1.domain.User;
+import com.example.experiment1.domain.jpa.User;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

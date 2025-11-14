@@ -1,4 +1,4 @@
-package com.example.experiment1.domain;
+package com.example.experiment1.domain.jpa;
 
 import java.time.Instant;
 import java.util.List;
