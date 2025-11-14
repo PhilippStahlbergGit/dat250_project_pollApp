@@ -35,8 +35,7 @@ public class UserController {
         if (authentication == null) {
             return null;
         }
-        String username = authentication.getName();
-        return userRepository.findByUsername(username).orElse(null);
+	return pollManager.meUser(authentication);
     }
 
     @PostMapping
