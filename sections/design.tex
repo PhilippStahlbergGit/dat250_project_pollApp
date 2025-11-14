@@ -47,12 +47,23 @@ The admin screen allows creating polls and voting on existing polls.
 
 The user screen allows registered users to vote on existing polls.
 
+\subsubsection{Application Flow diagram}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/Application_Flow_Diagram.drawio.png}
+    \caption{Application Flow Diagram}
+    \label{figs:login}
+\end{figure}
+
+The application flow diagram shows how an admin can log in directly, while a normal user must first register an account. After authentication, the user is routed to different pages depending on their role: the admin page, where polls can be created and voted on, or the normal user page, where the user can only vote on existing polls. By refreshing the page you are redirected to the login screen, due to it being session based.
+
 \subsection{The Domain Model}
 \label{sec:design}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\textwidth]{figs/Final_domain_model.png}
+    \includegraphics[width=0.6\textwidth]{figs/Final_domain_model.png}
     \caption{Domain Model}
     \label{figs:logo}
 \end{figure}
@@ -190,9 +201,6 @@ Each part shall ideally be accompanied with a graphical representation (diagram)
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
 
 
-
-
-You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
 
 
 You may have a look at the \href{https://github.com/selabhvl/dat250public/blob/master/projectdescription/README.md}{Examples on GitHub}.
