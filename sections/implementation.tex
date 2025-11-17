@@ -44,7 +44,24 @@ This way an ADMIN must be preconfigured to be made at startup, and in the comman
 
 
 \subsection{Cache Implementation}
-@Runar needs to write this part.
+
+The implementation of the Neo4j cache required quite a lot of modification to the original code. We added several new domain classes (PollAggregate and OptionVote), a specific Neo4jPollCache class which is an implementation of an interface PollCache, and a PollCacheRepository, which extends the Neo4jRepository from Spring Data.
+
+\subsubsection{PollAggregate}
+The PollAggregate is a specific object designed to be used to cache the votes of the specific options of a poll in a single object. It is identified by the Poll it is created from and contains a list of OptionVote, which is explained more in section~\ref{sec:OptionVote}. It also contains a LocalDateTime object which is used to decide whether the poll should be removed from the cache or not.
+
+\subsubsection{OptionVote}
+\label{sec:OptionVote}
+The OptionVote object contains the information we need to aggregate the number of votes for the options of a specific poll. It contains an option of the poll and the number of votes that the option has. 
+
+\subsubsection{Neo4jPollCache}
+This is the cache manager. It is connected to the PollCacheRepository, and to RabbitMQ. Whenever a user votes on a poll, this object checks whether there exists a PollAggregate object in the cache and whether this aggregate contains the option that is voted on. If everything matches, it either decrements or increments the results based on the user input. Then it updates the LocalDateTime object in PollAggregate and puts it back into the cache. If the PollAggregate does not exist, i.e. the poll has never been voted on or the poll has been cleared from the cache, it creates a new PollAggregate object corresponding to the vote and puts it into the cache. If the PollAggregate exists but the option that is voted on does not exist in the aggregate, it creates a new OptionVote object with the new vote and adds it to the existing PollAggregate, which is then put back into the cache.   
+
+It also has a scheduled cleaning method that runs every minute, removing polls that haven't been interacted with through a method deleteAggregateWithOptions defined in PollCacheRepository.
+
+\subsubsection{PollCacheRepository}
+This is the actual cache. It extends Neo4jRepository with a method for removing the polls through a Cypher query.
+
 
 
 EXAMPLE SCRIPT BELOW.
